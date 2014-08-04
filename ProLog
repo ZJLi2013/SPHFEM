@@ -1,0 +1,6 @@
+Aug 4 - 6
+
+fluid equation from NS to SPH formulation
+
+beam equation from elastic equation to FEM formulation
+
