@@ -1,0 +1,119 @@
+%========================================================================
+\documentclass[11pt]{article}
+\usepackage{graphics}
+\graphicspath{{figs/}}
+
+%===========================================
+% Fix the margins
+\setlength{\topmargin}{-0.4in}    % distance from top of page to begining of text
+\setlength{\textheight}{9.0in}    % height of main text
+\setlength{\textwidth}{6.5in}     % width of text
+\setlength{\oddsidemargin}{0.in}  % odd page left margin
+\setlength{\evensidemargin}{0.in} % even page left margin
+
+%===========================================
+\usepackage{amssymb,amsfonts}
+\usepackage{amsmath}
+
+%===========================================
+\begin{document}
+
+\title{SPH and Beam Equations}
+
+\author{Zhengjiang Li}
+
+\date{}
+
+\maketitle
+
+\section {Flow Governing Equations}
+
+Starting from three conservational equations(mass, momentum and energy), here I most talk about the first two equations, which can be found in " the basic equations for fluid mechanics".
+
+As standard SPH is assuming weakly-compressible. 
+
+\begin{equation} \label{eq:mass}
+	\frac{d \rho}{dt} = - \rho \nabla \cdot v
+\end{equation}	
+
+mass conservation in Lagrangain Description. $ \frac{d\rho }{dt}$ is material derivative.\ref{eq:mass}
+
+\begin{equation} \label{eq:momentom}
+	\rho \frac{dv}{dt} = \nabla \cdot \sigma + g
+\end{equation}
+
+momentum conservation in Lagrangian Description. $\sigma$ is stress, and it can be expressed as following,
+
+$$ \sigma = -P + \lambda \nabla \cdot v + \mu (\frac{\partial u_i}{\partial x_j} +\frac{\partial u_j}{\partial x_i}) $$
+
+\ref{eq:momentom}
+
+Decompose material derivative of  LHS in the above equation, we will get the std NS equation.
+
+As particles are moving but not fixed in the space, Lagrangian Description is suitable.
+
+\section{SPH Approximations}
+
+the basic idea behind SPH is  $ F(x) = \int F(x') \delta(x-x') dx' $, $\delta $is function defined only on a point,so SPH introduces the kernel function $w(x-x',h)$ to approximate $\delta$ in a sharp window $ (x-x_0, h)$
+
+To make sure good approximation, kernel function should satisfy:
+
+\begin{enumerate}
+\item {regularization}
+
+ $$ \int_{\Omega} W(x-x_j,h) dx_j = 1 $$
+
+\item {compact support}
+
+  $$  W(x-x_j) = 0  \forall x \in |x-x_j| > h $$
+
+\item{convergence}
+  as $$ \lim_{h \to 0}, W \to \delta $$
+  
+\end{enumerate}
+
+there are many choices of kernel function, introductions can be found from open source document DualPhysics,SPHysics, GPUSPH and commercial code SPH FLOW
+
+The role of kernel function is same as shape function in FEM, which is used to approxmite the variabls we are interested.  
+
+After this process,another approximation is integration to finite summation. 
+  $$ \int_{\Omega} f(x) W(x-x_j,h) dx_j = \sum_{i=1}^{N} \frac{m_i}{\rho_i} f(x_i) W(x-x_i,h) $$
+
+For $ \rho \nabla \cdot f = \nabla \cdot (\rho f) - f \cdot \nabla \rho $
+
+we can obtain
+
+$$ \rho_i \nabla \cdot f(x_i) = \sum_j m_j[f(x_i) - f(x_j)] \nabla w_{ij} $$
+
+For $ \frac{\nabla \cdot f}{\rho} = \frac{f}{\rho ^2} \nabla \rho + \nabla \frac{f}{\rho} $
+
+similar, we can obtain
+
+$$ \frac{\nabla \cdot f}{\rho} = \sum_j m_j (\frac{f_i}{\rho_i^2} + \frac{f_j}{\rho_j^2}) \nabla {w_{ij}} $$
+
+\begin{enumerate}
+	\item {density approximation}
+
+	$$ \rho_i = \sum_{j=1}^{N}m_i W(r_{ij}) $$
+
+	\item {accerlation approximation}
+	
+	$$ \frac{du}{dt} = \sum_j m_j( \frac{\sigma_i}{\rho_i^2} + \frac{\sigma_j}{\rho_j^2}) \nabla w_{ij} + \sum_j \frac{m_j}{\rho_j} f_j w_{ij} $$
+	
+\end{enumerate}
+
+after that we can update velocity, position of particles.
+
+\section{state equation}
+To obtain the pressure field, as we assume weakly compressble, again SPH introduce an $\rho - p$  state-equation 
+
+ $$ P = P_0 ((\frac{\rho}{\rho_0})^\gamma - 1) $$
+
+in which, $ P_0$, $\rho_0$ are initial pressure and initial density. $\gamma$ usually give a value: 7.15
+
+Another simple state equation we can use $p = c^2 \rho $.
+in which $c$ is a kind of virtual sound speed, to get convergence, we need to make sure $ w = u^2 / c^2 = 0.01 $ 
+
+
+
+\end{document}
