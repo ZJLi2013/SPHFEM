@@ -35,11 +35,11 @@ strong form of dynamic/vibration can be descripted as:
   
   \[
   \begin{cases}
-  $$ \sigma_{ji,j} + b_i = \rho \ddot{u_i} on \Omega $$
-  $$ u_i = 0  on \Gamma with fixed displacement $$
-  $$ \sigma_ij \cdot n_j = p_i on \Gamma with moving interface $$
-  $$ u_i(t=0) = u_0$$
-  $$ \dot{u_i(t=0)} = \dot{u_{i0}} $$
+  $$ \sigma_{ji,j} + b_i = \rho \ddot{u_i} on \Omega $$ \\
+  $$ u_i = 0  on \Gamma with fixed displacement $$ \\
+  $$ \sigma_ij \cdot n_j = p_i on \Gamma with moving interface $$ \\
+  $$ u_i(t=0) = u_0$$ \\
+  $$ \dot{u_i(t=0)} = \dot{u_{i0}} $$ 
   \end{cases} 
   \]
 
@@ -65,10 +65,33 @@ where $$ M^e = \int N^t \rho N dv $$
 
 	$$ f^e = \int N^T b dv + N^T t ds $$
 
-\section {plate element}
-in 2D simulation, we choice thin Kirchoff 4-node plate element.
+\section {plate stress element}
+in 2D simulation, we choice the 4-node plate stress element, which has two D.o.F. at each node. (Note, a plate element will have 3 D.O.F at each node, w displacement, $\theta_x$ $\theta_y$. For Kirchoff thin plate/shell theory, $\theta_x$ $\theta_y$ is derivative of w in terms of x and y respectively; and a shell element is the combination of a plate stress element(used to describe in-plane membrane stress) and a plate element(used to describe out-plane bending stress)) 
+
+with bilinear shape functions:
+
+$$N_1 = \frac{(1-\xi)(1-\eta)}{4}$$
+$$N_2 = \frac{(1+\xi)(1-\eta)}{4}$$
+$$N_3 = \frac{(1+\xi)(1+\eta)}{4}$$
+$$N_4 = \frac{(1-\xi)(1+\eta)}{4}$$
+
+the derivative of a scalar or a vector component in terms of the physical coordinate can be mapped to the same corresponding derivative in $\xi-\eta$ local coordinate by Jacobian Transformation. 
+
+
 
 \section {traction boundary}
+
+In this couple algorithm,interface transfer happens as following:
+
+\begin{enumerate}
+\item 
+  at the first first step, the interface boundary is the initial configuration/profile of the structure
+\item
+  the interface boundary act like repulsive particles, and which offer the extern force in SPH solver. call SPH solver and  update fluid particles information.
+\item
+  to keep momemtum conservation, add opposite repulsive force on structure boundary as the traction B.C. in FEM solver. call FEM solver, update the boundary position and return to step one. 
+\end{enumerate}
+
 
 
 
