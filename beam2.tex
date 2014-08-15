@@ -1,0 +1,128 @@
+%========================================================================
+\documentclass[11pt]{article}
+\usepackage{graphics}
+\graphicspath{{figs/}}
+
+%===========================================
+% Fix the margins
+\setlength{\topmargin}{-0.4in}    % distance from top of page to begining of text
+\setlength{\textheight}{9.0in}    % height of main text
+\setlength{\textwidth}{6.5in}     % width of text
+\setlength{\oddsidemargin}{0.in}  % odd page left margin
+\setlength{\evensidemargin}{0.in} % even page left margin
+
+%===========================================
+\usepackage{amssymb,amsfonts}
+\usepackage{amsmath}
+
+%===========================================
+\begin{document}
+
+\title{Nonlinear Beam Element}
+
+\author{Zhengjiang Li}
+
+\date{}
+
+\maketitle
+
+\section{Beam Kinematics Assumption}
+
+classic beam kinematics assumptions include, Euler-Bernoulli beam(EB) theory that neglects transverse shear strain; Timoshenko beam(TB) theory, that accounts for the transverse shear strain in a simpler way; and higher order beam theroy with additional terms into assumed displacement field.
+
+in TB, the assumed displacement field is
+
+$$ u(x,z) = u_0(x) + z \phi_x(x) $$
+$$ v(x,z) = 0 $$
+$$ w(x,z) = w_0(x) $$ 
+
+in which $u, v, w$ are displacements in longitudinal, lateral and transverse respectively. $u_0, w_0$ denote displacement of a point on mid-plane of an undeformed beam along axial(x) and transverse(z) directions
+
+
+in EB, the assumed displacement field is
+
+$$ u(x,z) = u_0(x) - z \frac{dw_0}{dx} $$
+$$ v(x,z) = 0 $$
+$$ w(x,z) = w_0(x) $$
+
+which means that the plane sections perpendicular to the mid-plane of the beam before deformation remain plane, and rotate such that they remain perpendicular to hte mid-plane after deformation.
+
+in our implementation, actually, we use much more simpler beam model, ignoring the axial deformation. so the kinematics equation is
+
+$$ u(x,z) = -z \frac{dw} {dx} $$
+$$ v(x,z) = 0 $$
+$$ w(x,z) = w(x) $$
+
+
+\section{strain-displacement relations}
+
+$$ \epsilon_{ij} = \frac{1}{2} ( \frac{\partial u_i}{\partial x_j} + \frac{\partial u_j}{\partial x_i}) + \frac{1}{2} ((\frac{\partial u_m}{\partial x_i} \frac{\partial u_m}{\partial x_j}) $$
+
+
+according to Kirchhoff's hypothesis(plane strain), $\epsilon_{zz}$, $\epsilon_{xz}$, $\epsilon_{yz}$ equal zero, and for a thin beam(ration of length and radius is larger than 10), $\epsilon_{yy}$, $\epsilon_{xy}$ is zero. so the only nonzero strain is axial strain:
+
+$$ \epsilon_{xx} = \frac{\partial u}{\partial x} + \frac{1}{2}[(\frac{\partial u}{\partial x})^2 + (\frac{\partial v}{\partial x})^2 + (\frac{\partial w}{\partial x})^2 $$
+
+which gives,
+
+$$ \epsilon_{xx} = -z \frac{d^2 w}{dx^2} + \frac{1}{2} (\frac{dw}{dx})^2 $$
+in general, 2D beam element will have 3 Degree of Freedom(DoF)s: $u, w, \theta$. in Timonsenko Theory, there are 3 DOFs; As the plane undeformed assumption in Euler-Bounulli Theory, there are only $u, w$ in EB beam. For our implementation, we use only $w$ as we said in kinemtic section.
+
+consider linear elastic of isotropic materials, $\sigma_{xx} = E \epsilon_{xx}$
+
+\section{weak form}
+
+ consider balance equation, and ignore body force, we obtain
+
+ $$ \frac{d^2}{dx^2}(EI \frac{d^2w}{dx^2}) + b = q $$
+
+in which , the body force in unit volume/length  $b$ is  inertia force 
+$$ b = - \rho \ddot{w} $$
+
+$q$ is the distributed tractional force from external(fluid environment).
+
+multiplying $\delta v$ and integrating over the interval $[0,L]$, we obtain:
+
+$$ \int_0^L (EI \frac{d^2 \delta v}{dx^2} \frac{d^2w}{dx^2} + b \delta v)dx = \int_0^L v q dx + v(0) Q_1 + (-\frac{dv}{dx})_{|x=0} Q_2 + v(L) Q_3 + (-\frac{dv}{dx}_{|x=L} Q_4 $$
+
+where $[Q_1, Q_2, Q_3, Q_4] = [-V(0), -M(0), V(L), M(L)] $, $V$ is shear force vertical to cross-section, $M$ is moment on cross-section.
+
+\section{finite element formulation}
+
+here we need Hermite shape function
+
+$$ w(x,t) = w_1(t) \phi_1(x) + \theta_1(t) \phi_2(x) + w_2(t) \phi_3(x) + \theta_2(t) \phi_4(x) $$
+
+define master element on length $l_e$ with coordinate $\xi$, ranging from $[-1, 1]$
+
+$$ \phi_1(x) = \frac{1}{4} (1-\xi)^2 (2+\xi) $$
+$$ \phi_2(x) = \frac{l_e}{8}(1-\xi)^2(1+\xi) $$
+$$ \phi_3(x) = \frac{1}{4} (1+\xi)^2 (2-\xi) $$
+$$ \phi_4(x) = \frac{l_e}{8}(1+\xi)^2(\xi-1) $$
+
+define $[w_1, \theta_1, w_2, \theta_2] = [ \Delta_1, \Delta_2,\Delta_3, \Delta_4] $
+
+$$ \sum_{j=1}^4 ( \int_0^L( EI \frac{d^2 \phi_i}{dx^2} \frac{d^2 \phi_j}{dx^2}\Delta_j - \rho \frac{d^2 \Delta_j}{dt^2} \phi_i \phi_j) dx) = \int_0^L \phi_i q(x,t) dx - Q_i $$  
+% this is actually on an element
+
+
+%$$ \sum_{j=1}^4 M_{ij} \ddot{\Delta_j} + \sum_{j=1}^4 K_{ij} \Delta_j = F_i $$ 
+
+\section{ nodal force}
+
+replace distribute force $\int_0^L \phi_i q dx $ with nodal force, cause we can easily obtain nodal force in this coupled design.
+
+so in every element, we have:
+
+$$ \sum_{j=1}^4 ( \int_0^L( EI \frac{d^2 \phi_i}{dx^2} \frac{d^2 \phi_j}{dx^2}\Delta_j - \rho \frac{d^2 \Delta_j}{dt^2} \phi_i \phi_j) dx) = F_i - Q_i $$  
+
+$Q_i$ is nonzero at the support end, the other end is free but will have nodal force from fluid.  
+
+this nodal force is obtained from the neighboring searching domain of each interface node.
+
+
+
+
+
+
+\end{document}
