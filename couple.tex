@@ -1,0 +1,83 @@
+%========================================================================
+\documentclass[11pt]{article}
+\usepackage{graphics}
+\graphicspath{{figs/}}
+
+%===========================================
+% Fix the margins
+\setlength{\topmargin}{-0.4in}    % distance from top of page to begining of text
+\setlength{\textheight}{9.0in}    % height of main text
+\setlength{\textwidth}{6.5in}     % width of text
+\setlength{\oddsidemargin}{0.in}  % odd page left margin
+\setlength{\evensidemargin}{0.in} % even page left margin
+
+%===========================================
+\usepackage{amssymb,amsfonts}
+\usepackage{amsmath}
+
+%===========================================
+\begin{document}
+
+\title{couple fluid and structural}
+
+\author{Zhengjiang Li}
+
+\date{}
+
+\maketitle
+
+
+
+\section {system governing equation}
+
+In each time step, SPH for fluid, we calculate velocity of each particle, and then update the other properties of that point, such as its displacement,density and  pressure; and FEM for stuctural, we calculate beam deflection from the equation, and then update other properties, such as stress, strain.
+
+so in this couple system, the self-dependent variable are particles' velocity vector $v(x,y,t)$ and FEM node position vector $w(x,t)$. the governing equation are:
+
+   $$	\rho _i \dot{v_i} = \Delta \sigma _i + g_i + f_i^{s2f} $$ 
+   $$	\frac{d^2}{dx^2}(EI \frac{d^2w_I}{dx^2} )- \rho_I \ddot{w_I} = f_I^{f2s} $$
+
+the two equations are coupled by $f^{s2f}$ and $f^{f2s}$. as one FEM node correspond to multi fluid particles, while each fluid particles correspond to at most 2 FEM node, so these two forces are actually not equivalent.
+
+
+Note in this simple case, all beam nodes play dual-roles as FEM node as well as interface nodes. 
+
+one way is set interface node - fluid particle Pair $<i, I>$, here $i$ stands for fluid particle, and $I$ stands for interface node, which obtain:
+
+$$ f^{s2f} = \sum_i repulse\_force(<i,I>) $$
+$$ f^{f2s} = \sum_I -repulse\_force(<i,I>) $$
+
+\section{approximation of equations}
+
+for sph particle velocity vector:
+
+$$ \frac{du}{dt} = \sum_j m_i( \frac{\sigma_i}{\rho ^2 _i } + \frac{\sigma_j}{\rho^2 _j} )\nabla w_{ij} + \sum_j \frac{m_j}{\rho _j} f^{s2f}_j w_{ij} $$
+
+Note to update the approximation fluid equation, we need calculate $\rho_i$, $w_{ij}$ at first.
+
+
+for beam deflection displacement:
+
+as before, we adopt Hermite shape function $ w = \sum_{k=1}^4 \Delta_k \theta_k $, then
+
+$$ \sum_{J=1}^4 EI(\theta_I, \theta_J) \Delta_J - \rho \ddot{\Delta_J} l(\theta_I, \theta_J) = f_I^{f2s} $$
+
+the other parts of sph , FEM algorithm, please check <sph.pdf> and <beam2.pdf>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
