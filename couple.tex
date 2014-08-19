@@ -34,7 +34,7 @@ In each time step, SPH for fluid, we calculate velocity of each particle, and th
 
 so in this couple system, the self-dependent variable are particles' velocity vector $v(x,y,t)$ and FEM node position vector $w(x,t)$. the governing equation are:
 
-   $$	\rho _i \dot{v_i} = \Delta \sigma _i + g_i + f_i^{s2f} $$ 
+   $$	\rho _i \dot{v_i} = \nabla \sigma _i + g_i + f_i^{s2f} $$ 
    $$	\frac{d^2}{dx^2}(EI \frac{d^2w_I}{dx^2} )- \rho_I \ddot{w_I} = f_I^{f2s} $$
 
 the two equations are coupled by $f^{s2f}$ and $f^{f2s}$. as one FEM node correspond to multi fluid particles, while each fluid particles correspond to at most 2 FEM node, so these two forces are actually not equivalent.
@@ -62,21 +62,15 @@ as before, we adopt Hermite shape function $ w = \sum_{k=1}^4 \Delta_k \theta_k 
 
 $$ \sum_{J=1}^4 EI(\theta_I, \theta_J) \Delta_J - \rho \ddot{\Delta_J} l(\theta_I, \theta_J) = f_I^{f2s} $$
 
-the other parts of sph , FEM algorithm, please check <sph.pdf> and <beam2.pdf>
+
+say $ \sum_{J=1}^4 EI(\theta_I,\theta_J) = K_{IJ}$, $ \rho l(\theta_I, \theta_J) = M_{IJ} $, $\mu \Delta u = L_i$, we can integratthe system equation in matrix form:
 
 
+ $$ \begin{bmatrix} M && 0 \\ 0 && I \end{bmatrix} \{ \begin{array}{c} \ddot{\Delta_J} \\ \dot{v} \end{array} \} + \begin{bmatrix} K && 0 \\ 0 && L \end{bmatrix} \{ \begin{array}{c} \Delta_J \\ v \end{array} \} = \{ \begin{array}{c} f^{f2s}\\ f^{s2f} \end{array} \} $$
 
+in which, $\Delta_J$ is the 4 DOF of FEM node, $v$ is SPH velocity vector(2 dimension), $L$ is Laplace Operator.
 
-
-
-
-
-
-
-
-
-
-
+the other parts of sph , FEM algorithm, please check $sph.pdf$ and $beam2.pdf$
 
 
 
