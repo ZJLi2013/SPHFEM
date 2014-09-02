@@ -183,8 +183,7 @@ $$ K = \sum_{ne} T^T k^e T $$
 $$ F = \sum_{ne} T^T f^e $$ 
 
 
-\subitem{4.2 Tm beam element}
-
+\subitem{4.2 Timosheko beam element}
 Interpolate $w, \theta$ respectively, linear shape function is easy but not gurantee strain continuity at node, as $E_{xx} = w_{,x}^2/2 - z \theta_{,x} $, both $w, \theta$ here have first derivatives. So the right thing is to construct shape function at least second order. So both $w, \theta$ need use Hermite shape function.
   
 $$ w = \sum_{i=1}^4 \Delta_i N_i $$
@@ -197,7 +196,7 @@ note that $ \delta E_{xx} = w_{,x} \delta w_{,x} - z \delta \theta_{,x} $, for n
 the element stiff matrix  
 
 $$
-(w_{,x}^L)^2 \begin{bmatrix} \frac{\partial N_i}{\partial x} \\ \frac{\partial \phi_i}{\partial x} \end{bmatrix} ^T \times \begin{bmatrix} \frac{\partial N_i}{\partial x} \\ \frac{\partial \phi_i}{\partial x} \end{bmatrix}
+(w_{,x}^L)^2 \begin{bmatrix} \frac{\partial N_i}{\partial x} \\ \frac{\partial \phi_i}{\partial x} \end{bmatrix} ^T \cdot \begin{bmatrix} \frac{\partial N_i}{\partial x} \\ \frac{\partial \phi_i}{\partial x} \end{bmatrix}
 $$
 the element mass matrix and element force vector are same as EB beam element, and matrix assembly is same as EB. 
    
@@ -211,25 +210,69 @@ $$ \frac{d \rho}{dt} = - \rho \nabla  v $$
 
 momentum equation is 
 
-$$ \rho \frac{dv}{dt} = - \nabla P + \mu \Delta^2 v + g $$
+$$ \frac{dv}{dt} = - \frac{1}{\rho} \nabla P + \Gamma + g $$
 
-To update pressure here, introduce $p-\rho$ relationship
+where $v$ is fluid particle velocity, and $\Gamma$ refers to dissipative terms and $ g=(0,0,-9.81) m/s^{-2} $. Basically two ways here to implement:
 
-$$ p = c^2 \rho$$
+\begin{enumerate}
+\item{artificial viscosity}
+artificial viscosity proposed by Monaghan(1992), the equation above is:
 
-where $ c^2 = 100 u^2 $ is virtual sound speed. 
+$$  \frac{dv_i}{dt} = - \sum_{j} m_j (\frac{P_i}{\rho _i ^2} + \frac{P_j}{\rho_j ^2} + \Pi _{ij} ) \nabla_i W_{ij} + g $$
 
-For sph particle velocity vector:
+where viscosity term $\Pi_{ij}$ is given by
 
-$$ \frac{du}{dt} = \sum_j m_i( \frac{\sigma_i}{\rho ^2 _i } + \frac{\sigma_j}{\rho^2 _j} )\nabla w_{ij} + \sum_j \frac{m_j}{\rho _j} f^{s2f}_j w_{ij} $$
+$$ \Pi_{ij} = \{ \begin{array}{c} \frac{-\alpha \bar{c_{ij}} \mu_{ij}}{\rho _{ij}} \; v_{ij} \cdot r_{ij} < 0 \\ 0 \;  v_{ij} \cdot r_{ij} > 0 \end{array} $$
 
+where $ \mu_{ij} = \frac{h v_{ij} r_{ij}}{ r_{ij}^2 + \eta ^2} $, $\eta^2 = 0.01 h^2$, $\bar{c_{ij}} = \frac{1}{2}(c_i+c_j)$ is the mean sound speed. $\alpha = 0.3$, $c=10$  for DamBreak case. 
+
+\item{laminar viscosity}
+proposed by Lo and Shao (2002)$$  \frac{dv_i}{dt} = - \sum_{j} m_j (\frac{P_i}{\rho _i ^2} + \frac{P_j}{\rho_j ^2}) \nabla_i W_{ij} + g + \sum_{j} \frac{4 \nu_0 r_{ij} \cdot \nabla_i w_{ij}}{(\rho_i + \rho_j)(r_{ij}^2+\eta^2)}v_{ij} $$
+$$  \frac{dv_i}{dt} = - \sum_{j} m_j (\frac{P_i}{\rho _i ^2} + \frac{P_j}{\rho_j ^2}) \nabla_i W_{ij} + g + \sum_{j} \frac{4 \nu_0 r_{ij} \cdot \nabla_i w_{ij}}{(\rho_i + \rho_j)(r_{ij}^2+\eta^2)}v_{ij} $$
+where $\nu_0$ is kinetic viscosity $ 10^{-6} m^2s^{-1} $
+
+\end{enumerate}
+
+choose Quadratic Kernel function
+
+$$w(r_{ij},h)  = \alpha_D [ \frac{3}{16} q^2 - \frac{3}{4} q + \frac{3}{4}] \; 0 \leq q \leq 2 $$
+
+the frist gradient is $ \nabla_i w_{ij} = \alpha_D (\frac{3}{8} q - \frac{3}{4})$
+
+where $ q= r_{ij}/h $, $alpha_D = \frac{2}{\pi h^2}$ for 2D case.
+
+For artificial viscosity, define
+
+$$ L = \sum_j \frac{m_j \alpha c_{ij}}{\rho _ {ij}} \frac{h r_{ij}}{r_{ij}^2 + \eta^2} \nabla_i w_{ij}$$ when $ v_{ij} \cdot r_{ij} < 0 $ else $ L =0 ,  v_{ij} \cdot r_{ij} > 0$
+
+For laminar viscosity, define
+$$ L = \sum_{j} \frac{4 \nu_0 r_{ij} \cdot \nabla_i w_{ij}}{(\rho_i + \rho_j)(r_{ij}^2+\eta^2)} $$ 
+
+and for both artificial viscosity and laminar viscosity, we have the term unrelated to velocity, defined as
+
+$$ RHS_0 =  - \sum_{j} m_j (\frac{P_i}{\rho _i ^2} + \frac{P_j}{\rho_j ^2}) \nabla_i W_{ij} + g $$
+
+so sph governing equation in matrix format is 
+$ \ddot{v_i} - L v_{ij} + RHS_0 $
+
+To update density of fluid particles, we use 
+
+$$ \frac{d \rho_i}{dt} = \sum_j m_j v_{ij} \nabla_i w_{ij} $$
+
+and to update pressure we use Monaghan(1994) state equation as
+
+$$ P = B[ (\frac{\rho}{\rho_0})^ \kappa - 1] $$
+
+where $\kappa = 7$, $B= c_0^2 \rho_0 /\kappa$, $\rho_0 = 1000 kgm^{-3}$ 
+
+we can see here, the update of particles density and pressure are not directly related to the coupled system. so these two parameters are not solve simultaneous with particle velocities $v$ in final.
 
 \section{coupled system approximation}
 
-
 here use EB beam element
- $$ \begin{bmatrix} M && 0 \\ 0 && I \end{bmatrix} \{ \begin{array}{c} \ddot{\Delta_J} \\ \dot{v} \end{array} \} + \begin{bmatrix} K && 0 \\ 0 && L \end{bmatrix} \{ \begin{array}{c} \Delta_J \\ v \end{array} \} = \{ \begin{array}{c} f^{f2s}\\ f^{s2f} \end{array} \} $$
+ $$ \begin{bmatrix} M && 0 \\ 0 && I \end{bmatrix} \{ \begin{array}{c} \ddot{\Delta_J} \\ \dot{v} \end{array} \} + \begin{bmatrix} K && 0 \\ 0 && L \end{bmatrix} \{ \begin{array}{c} \Delta_J \\ v \end{array} \} = \{ \begin{array}{c} f^{f2s}\\ f^{s2f}+RHS_0 \end{array} \} $$
 
+where $ \Delta_J$ stands for displacement in structural, $v$ stands for velocity of particles. 
 
 \section{Reference}
 % \bibliography
