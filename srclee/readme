@@ -1,0 +1,11 @@
+
+member initialization list
+
+Example from Essential C++ page 100 
+
+Triangular::Triangular(const Triangular &rhs)
+ : _length(rhs._length),
+   _beg_pos(rhs._beg_pos),
+   _next(rhs._beg_pos-1)
+  {}
+

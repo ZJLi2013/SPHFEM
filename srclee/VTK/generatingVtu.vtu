@@ -1,0 +1,14 @@
+/*
+ basically, a pvtu file is parent, it calls PART1.vtu, PART2.vtu..
+ if you read pvtu file, paraview automatically read all the sub domain vtu files
+
+*/
+
+<Piece Source ="PART1.vtu"/>
+<Piece Source ="PART2.vtu"/>
+.
+.
+.
+<Piece Source ="PARTn.vtu"/>
+
+

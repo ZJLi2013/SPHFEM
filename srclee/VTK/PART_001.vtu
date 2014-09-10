@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+<UnstructuredGrid>
+ <Piece NumberOfPoints="3" NumberOfCells="1">
+  <PointData Scalars="Pressure" Vectors="Velocity">
+	<DataArray type="Float32" Name="Pressures" NumberOfComponents="3" format="ascii">
+	0.0 0.0 0.0
+	1.0 1.0 0.0
+	0.0 1.0 0.0
+	</DataArray>
+	
+	<DataArray type="Float32" Name="Density" format="ascii">
+		...
+	</DataArray>
+
+	<DataArray type="Float32" Name="Velocity" NumberOfComponents="2" format="ascii">
+		...
+	</DataArray>
+
+   </PointData>
+
+   <Points>
+      <DataArray type="Float32" NumberOfComponents="3" format="ascii">
+	      0.01 0.01 0.02
+   </Point>
+
+   <Cells>
+	<DataArray type="Int32" Name="connectivity" NumberOfComponents="1" format="ascii">
+	0 1 2
+	</DataArray>
+	
+	<DataArray type="Int32" Name="offsets" NumberOfComponents="1" format="ascii">
+	3
+	</DataArray>
+
+	<DataArray type="Int32" Name="types" NumberOfComponents="1" format="ascii">
+	5
+	</DataArray>
+   </Cells>
+
+<!--<CellData Scalars="Material">
+	<DataArray type="Int32" Name="Material" NumberOfComponents="1" format="ascii">
+	1
+	</DataArray>
+</CellData>
+-->
+</Piece>
+</UnstructuredGrid>
+</VTKFile>
+
+#$//http://www.cfd-online.com/Forums/paraview/124844-generating-vtu-pvtu-files.html
+
+
+

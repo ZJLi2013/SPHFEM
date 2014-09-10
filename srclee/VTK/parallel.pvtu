@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
+<PUnstructuredGrid GhostLevel="0">
+<PPoints>
+	<PDataArray type="Float32" Name="Position" NumberOfComponents="3"/>
+</PPoints>
+<PCells>
+	<PDataArray type="Int32" Name="connectivity" NumberOfComponents="1"/>
+	<PDataArray type="Int32" Name="offsets" NumberOfCompoents="1"/>
+	<PDataArray type="UInt8" Name="types" NumberOfComponents="1"/>
+</PCells>
+<PCellData Scalars="Material">
+	<PDataArray type="Int32" Name="Material" NumberOfComponents="1"/>
+</PCellData>
+<Piece Source="PART1.vtu"/>
+<Piece Source="PART2.vtu"/>
+</PUnstructuredGrid>
+</VTKFile>
+
+
+
