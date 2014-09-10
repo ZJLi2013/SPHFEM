@@ -4,3 +4,27 @@ fluid equation from NS to SPH formulation
 
 beam equation from elastic equation to FEM formulation
 
+SPHERIC Database of literature : https://wiki.manchester.ac.uk/spheric/index.php/Database_of_SPH_literature
+
+SPH-FLOW references http://www.sph-flow.com/references.html
+
+two open source projects : 
+
+DualPhysics, SPHysics, GPUSPH 
+ 
+
+Aug 5
+
+benchwork of SPH-FEM from Yang Qing
+
+1 flow in sloshing tank interaction with an elastic body
+
+2 dam break with an elastic gate
+
+
+Aug 15
+transfer fluid-structure
+
+start by multiplying governing equation and traction boundary condition by w(x) and integrating over the domains on which they hold: for the governing equation, the pertinent domain is the interval[0,L], whereas for the traction boundary condition, it's two lateral boundary
+
+
