@@ -73,4 +73,17 @@ void gravity_direction(){
 	gravity_direction = normalize(gravity_direction);
 }
 
+void integration()
+{
+	float simulation_time = 0.4;
+	float timestep = 0.0001;
+	int totsteps = simulation_time/timestep;
+	
+	for(int i=0; i< totsteps; i++)
+	{
+		add_global_forces();
+		solver.update();
+		display(i,particle_count);
+	}
+}
 

@@ -7,14 +7,15 @@
 
 using namespace std;
 
-int main()
+int display(int istep, int particle_count)
 {
 
 	string file_name;
 // define the directory path if need
 
-	int totstep(200);
-	int np(40);
+//	int totstep(200);
+//	int np(40);
+	int np = particle_count;
 
 /*the following pressure, velocity, posisiton are only test data 	
 struct Particle	{
@@ -40,8 +41,8 @@ struct Particle	{
 the above is only test data */
 
 
-	for( int istep=1;istep <= totstep; istep++)
-	{
+//	for( int istep=1;istep <= totstep; istep++)
+//	{
 		if(istep<10)
 			file_name = "PART_000" + to_string(istep) + ".vtu";
 		else if( istep>=10 && istep<100)
@@ -50,7 +51,7 @@ the above is only test data */
 			file_name= "PART_0" + to_string(istep) + ".vtu";
 		else
 			file_name= "PART_"+ to_string(istep) + ".vtu";
-	}
+//	}
 
 // data need to read in, position, velocity, rho, pressure
 

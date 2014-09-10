@@ -1,8 +1,12 @@
 #include "system.h"
+#include "display.h"
 
-int main(int argc, char* argv[])
-{
-	system();
+
+int main()
+{	
+	init_system();
+	
+	integration();
 	return 0;
 }
 

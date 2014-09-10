@@ -87,6 +87,8 @@ void SphFluidSolver::update_forces()
 
 void SphFluidSolver::update_particle(Particle &particle)
 {	
+	
+	float timestep = 0.0001; // bad design
 	particle.velocity += timestep * particle.force;
 	particle.position += timestep * particle.velocity;
 }
