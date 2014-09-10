@@ -5,25 +5,30 @@
 #include "system.h"
 using namespace std;
 
-#define Width 20
-#define Height 20
+#define Width 0.001
+#define Height 0.001
+#define HSML 0.000025
+#define TS   0.0001
 
-SphFluidSolver solver(Width, Height, 1.1f, 0.01f);
+SphFluidSolver solve(HSML, TS);
 
 void init_system()
 {
+	/* initial partical distribution*/
+	int npx = (int)WIDTH/HSML+1;
+	int npz = (int)HEIGHT/HSML+1;
+	double dx = HSML;  
+	double dz = HSML;
+
 	Particle *particles = new Particle[particle_count];
 	Particle *particle_iter = particles;
 
-	while(true){
-		if(count-- == 0){
-			solver.init_particles(particles,particle_count);
-			return;
-		}
-
-		particle_iter->position.x = rand(particle.id);
-		particle_iter->position.z = rand(particle.id);
-		particle_iter++;
+	solver.init_particles(particles, particle_count);	
+		
+	/* initial partical postion */
+	particle_iter->position.x = ((particle_iter->id)%npx -1) * dx;
+	particle_iter->position.z = (particle_iter->id)/npx *dz;
+	particle_iter++;
 	}
 }
 
