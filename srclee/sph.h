@@ -34,42 +34,29 @@ struct Particle {
 class SphFluidSolver {
 //	const float domain_width;
 //	const float domain_height;
+	private:
 	const float hsml;  // smoothed length
 	const float timestep;
-	const float vsp //velocity of sound speed
+	const float vsp; //velocity of sound speed
 
 	public:
-	list<Particle> particles_list; 	
-/*SphFluidSolver( float domain_width, 
-		float domain_height,
-		float hsml,
-		float timestep) 
-: npx((int)( domain_width/hsml)+1),
-  npz((int)( domain_height/hsml)+1),
-  hsml(hsml),
-  timestep(timestep)
-  vsp(10.0)	{
-  }
-*/
+	list<Particle> p_list; 	
+
+	public:
 SphFluidSolver(	float hsml,
 		float timestep) 
  : hsml(hsml),
-   timestep(timestep)
+   timestep(timestep),
    vsp(10.0)	{
   }
 
-
-/* npx is the number of particles in x direction
- * npz is the number of particles in z direction
- */
-
-void update();
+void update(list<Particle> p_list);
 
 void init_particles(Particle *particles, int count);
 
 template <typename Function>
 	void foreach_particle(Function function){
-		list<Particle> &plist = particles_list;
+		list<Particle> &plist = p_list;
 		for(list<Particle>::iterator piter = plist.begin(); piter !=plist.end(); piter++){
 			function(*piter);
 		}
@@ -81,13 +68,17 @@ float kernel(const Vector2f &r, const float h);
 
 Vector2f gradient_kernel(const Vector2f &r, const float h);
 
-float add_density(Particle &particle, Particle &neighbour);
+void add_density(Particle &particle, Particle &neighbour);
 
-void update_densities();
+void sum_all_densities(list<Particle>, Particle &particle);
 
-void add_forces(Particle &particle, Particle &neighbour);
+void update_densities(list<Particle>);
 
-void update_forces();
+void add_force(Particle &particle, Particle &neighbour);
+
+void sum_all_forces(list<Particle>, Particle &particle);
+
+void update_forces(list<Particle> p_list);
 
 void update_particle(Particle &particle);
 
@@ -97,7 +88,7 @@ void update_particles();
 
 void reset_particles():
 */
-}
+};
 #endif
 
 
