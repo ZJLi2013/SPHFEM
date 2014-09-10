@@ -54,6 +54,8 @@ void update(list<Particle> p_list);
 
 void init_particles(Particle *particles, int count);
 
+void update_boundary_force(list<Particle> p_list, list<Particle> bcp_list);
+
 template <typename Function>
 	void foreach_particle(Function function){
 		list<Particle> &plist = p_list;
@@ -79,6 +81,8 @@ void add_force(Particle &particle, Particle &neighbour);
 void sum_all_forces(list<Particle>, Particle &particle);
 
 void update_forces(list<Particle> p_list);
+
+void boundary_force(Particle &particle, list<Particle> bcp_list);
 
 void update_particle(Particle &particle);
 

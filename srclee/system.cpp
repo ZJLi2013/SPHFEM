@@ -7,8 +7,8 @@ using namespace std;
 
 #define Width 0.001
 #define Height 0.001
-#define HSML 0.000025
-#define TS   0.0001
+#define HSML 0.000025  //smooth kernel length
+#define TS   0.0001    //timestep (dt)	
 
 SphFluidSolver solve(HSML, TS);
 
@@ -34,16 +34,22 @@ void init_system()
 
 void add_gravity(Particle &particle)
 {
-	particle.force += gravit*gravity_direction;
+	particle.force += gravity*gravity_direction;
 }
 
 void add_global_forces()
 {
-	solver.foreach_particle(add_gravity_force):
+	solver.foreach_particle(add_gravity):
 }
 
-// void boundaryforce
+/*
+void add_bc_forces()
+{
+	solver.foreach_particle(SphFluidSolver::boundary_force);
+	}
+*/
 
+/* boundary force
 void boundarycollision(Particle &particle)
 {
 	float &px = particle.position.x;
@@ -66,6 +72,7 @@ void boundarycollision(Particle &particle)
 void handle_collisions(){
 	solver.foreach_particle(boundarycollision);
 }
+*/
 
 void gravity_direction(){
 	gravity_direction.x = - rotation_matrix[1];
@@ -82,7 +89,8 @@ void integration()
 	for(int i=0; i< totsteps; i++)
 	{
 		add_global_forces();
-		solver.update();
+		solver.update_boundary_force(list<Particle> p_list, list<Particle> bcp_list);
+		solver.update(list<Particle> p_list);
 		display(i,particle_count);
 	}
 }
