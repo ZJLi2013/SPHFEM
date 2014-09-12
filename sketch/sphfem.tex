@@ -1,0 +1,283 @@
+%========================================================================
+\documentclass[11pt]{article}
+\usepackage{graphics}
+\graphicspath{{figs/}}
+
+%===========================================
+% Fix the margins
+\setlength{\topmargin}{-0.4in}    % distance from top of page to begining of text
+\setlength{\textheight}{9.0in}    % height of main text
+\setlength{\textwidth}{6.5in}     % width of text
+\setlength{\oddsidemargin}{0.in}  % odd page left margin
+\setlength{\evensidemargin}{0.in} % even page left margin
+
+%===========================================
+\usepackage{amssymb,amsfonts}
+\usepackage{amsmath}
+
+%===========================================
+\begin{document}
+
+\title{2D fluid beam couple by SPH and FEM}
+
+\author{Zhengjiang Li}
+
+\date{}
+
+\maketitle
+
+
+
+\section {system governing equation}
+
+In this couple system, the self-dependent variable are particles' velocity vector $v(x,y,t)$ and FEM node position vector $w(x,t)$. so system governing equations are:
+
+   $$	\rho  \dot{v} = \nabla \sigma + g + f^{s2f} $$ 
+$$ \rho \frac{\partial^2 w}{\partial t^2} + \frac{\partial^2}{\partial x^2}( EI \frac{\partial^2 w}{\partial x^2}) - N(x,t) \frac{\partial^2 w}{\partial x^2} = q(x,t) $$
+
+where $N(x,t)$ is the normal force. defined as $ N(x,t) = EA \epsilon(x,t) $
+
+$q(x,t)$ is the average traction of nodal force from fluid to structural $f^{f2s}$. 
+
+\begin{subequations}
+\begin{align}
+ \int_0^L q(x,t) dx = \sum_{i=1}^{np} f^{f2s}_i \\
+q_i = \frac{f_i + f_{i+1}}{2l_e}, \  1< i < np \\
+q_1 = (f_1 + f_2/2)/ l_e \\
+q_{np} = (f_{np-1}/2 + f_{np})/l_e 
+\end{align}
+\end{subequations}
+
+where $ q(x,t)$ is the equivalent distributed traction, and $np$ is the number of interface nodes. $q_i$ stands for a constant traction on an element length. 
+
+
+The two equations are coupled by $f^{s2f}$ and $f^{f2s}$. as one FEM node correspond to multi fluid particles, while each fluid particles correspond to at most 2 FEM node, so these two forces are actually not equivalent.
+
+
+Note in this simple case, all beam nodes play dual-roles as FEM node as well as interface nodes. One way is to set interface node - fluid particle Pair $<i, I>$, here $i$ stands for fluid particle, and $I$ stands for interface node, which obtain:
+
+$$ f^{s2f} = \sum_i repulse\_force(<i,I>) $$
+$$ f^{f2s} = \sum_I -repulse\_force(<i,I>) $$
+
+\section{weak form of structural governing equation}
+
+\begin{enumerate}
+
+\item{kinematic equation}
+
+An accurate 2D kinemtic relationship is, details in \cite[p.~215]{limingrui}
+
+\begin{subequations}
+ \begin{align}
+	U &= u - z \sin \theta \\
+	W &= w - z(1- \cos \theta)
+  \end{align}
+ \end{subequations}
+
+here, $u, w$ are displacements of neutral axis, and $\theta$ is rotational angle of an arbitrary cross-section.
+
+\item{displacemnt-strain equation}
+
+taking derivativs of kinematic equation, in terms of $x,y$ respectively:
+
+ \begin{subequations}
+	\begin{align}
+	U_{,x} = u_{,x} - z \theta_{,x} \cos \theta \\
+	U_{,z} = - \sin \theta \\
+	W_{,x} = w_{,x} - z \theta_{,x} \sin \theta \\
+	W_{,z} = -(1- \cos \theta)
+	\end{align}
+\end{subequations}
+
+here we still adopt Euler-Boulluni Assumption, that the cross-section plane keep straight and vertical to neutral axis before and after deformation.
+
+Giving Green-Lagrangian strain:
+ \begin{subequations}
+	\begin{align}
+	E_{xx} = U_{,x} + ( U_{,x}^2 + W_{,x}^2)/2 = u_{,x} - z \theta_{,x} \cos \theta = u_{,x} + ( u_{,x}^2 + w_{,x}^2)/2 + z^2 \theta_{,x}^2/2 - z \theta_{,x} R_{es}  \\
+	E_{xz} = U_{,x} + W_{,x} + U_{,x} U_{,z} + W_{,x} W_{,z} = R_{en} \\ 
+	E_{zz} = W_{,z} + ( U_{,z}^2 + W_{,z}^2)/2 = 0
+	\end{align}
+\end{subequations}
+
+in which, $ R_{es} = (1 + u_{,x}) \cos \theta + v_{,x} \sin \theta $, and $R_{en} = v_{,x} \cos \theta - ( 1 + u_{,x}) \sin \theta$
+
+\item{virtual work and weak form}
+
+\subitem { 3.1  virtual work } \\
+In finite deformation theory, Green-Lagrangian Strain $E_{xx}$ is energy-conjugate couple correspond to Second Piola-Kirchhoff stress $S_{xx}$. so the internal force virtual work is
+
+$$ \delta W^{in} = \int (S_{xx} \delta E_{xx}^T) dx =  \int (E_{xx} E \delta E_{xx}^T) dx $$
+
+where $E$ is the linear elastic constant constitution module. 
+
+$$ \delta W^{out} = \int -\rho \ddot{\delta w} + q \delta w dx $$
+
+\subitem{3.2 weak form from balance equation}\\
+
+Consider Green-Lagrangian Strain as before, and multiply $\delta v$ at both side of balance equation,and integration on the whole beam, we obtain the weak form:
+
+$$ \int ( EI \frac{d^2 \delta v}{dx^2} \frac{d^2 w}{dx^2} + \rho \ddot{w} \delta v + N^L \frac{d w}{dx} \frac{d \delta v}{dx}) dx = \int q \delta v dx - v(0)Q(0) + \frac{dv}{dx}|_{x=0} M(0) + v(L)Q(L) - \frac{dv}{dx}|_{x=L}M(L) + N^L \frac{dw}{dx}v|^L_0 $$
+
+consider boundary condition:
+$ \delta v(0) = \frac{\delta v}{dx} = M(L) = Q(L) = \frac{\partial w}{\partial x}|_{x=0} = 0 $, so the weak form above is:
+
+$$ \int ( EI \frac{d^2 \delta v}{dx^2} \frac{d^2 w}{dx^2} + \rho \ddot{w} \delta v + N^L \frac{d w}{dx} \frac{d \delta v}{dx}) dx = \int q \delta v dx + N^L \frac{dw}{dx}v _ | {x=L} $$
+
+\item{matrix approximation}
+
+virtual work equation above is easy to implement based on Timoshenko Beam Assumption; and weak form from balance equation is based on Euler-Boulluni Beam Assumption. so we can use either linear interpolations for $u, w, \theta$ as TB or linear interpolation for $u$ and Hermite interpolation for $w$ as EB.
+
+Since only lateral deflection is obvious,an even simpler implementation here is to let $ u_{,x} = 0 $, namely ignore axial displacement of neutral axis.  And $ z^2 \theta_{,x} ^2 = o(dx^2)$.
+
+
+For large rotation, Timonshenko Theory is better, and it's easy to implement on both Total Langrange Method and Update Langrange Method. While Euler-Boulluni Theory is  an good approximate, but strict to UL implementation.
+
+in the following, we will introduce these two ways.
+
+\subitem{4.1 EU Beam element} \\
+
+Hermite Interpolation:
+$$ w(x,t) = w_1(t) \phi_1(x) + \theta_1(t) \phi_2(x) + w_2(t) \phi_3(x) + \theta_2(t) \phi_4(x) $$
+
+Define master element on length $l_e$ with coordinate $\xi$, ranging from $[-1, 1]$
+
+$$ \phi_1(x) = \frac{1}{4} (1-\xi)^2 (2+\xi) $$
+$$ \phi_2(x) = \frac{l_e}{8}(1-\xi)^2(1+\xi) $$
+$$ \phi_3(x) = \frac{1}{4} (1+\xi)^2 (2-\xi) $$
+$$ \phi_4(x) = \frac{l_e}{8}(1+\xi)^2(\xi-1) $$
+
+define $[w_1, \theta_1, w_2, \theta_2] = [ \Delta_1, \Delta_2,\Delta_3, \Delta_4] $
+
+from master element to physical element we need define an Jacobian Transformation, which is simple for 2-node  beam element  as $ x = \frac{l_e}{2} (\xi + 1)$
+$$ J = \frac{\partial \xi}{\partial x} = 2/l_e $$
+
+
+in an element, the following satisfy:
+$$ \sum_{i=1}^4 \sum_{j=1}^4 ( \int_{-1}^{1}( EI \frac{d^2 \phi_i}{dx^2} \frac{d^2 \phi_j}{dx^2}\Delta_j + \rho \frac{d^2 \Delta_j}{dt^2} \phi_i \phi_j + N^L \frac{d \phi_i}{dx} \frac{d \phi_j}{dx} \Delta_j) dx) = \int_{-1^{1}} \phi_i q(x,t) dx $$  
+
+From local coordinate system to global coordiante system, we need define transformation matrix $T$
+
+$$
+\{ \begin{array}{c} w^l \\ \theta^l \end{array} \} = \begin{bmatrix} \cos \varphi & 0 \\ 0 & 1 \end{bmatrix} \{ \begin{array}{c} w^g \\ \theta^g \end{array} \}
+$$
+
+Define element stiff matrix, element mass matrix and element force as :
+
+\begin{subequations}
+\begin{align}
+k^e = \sum_{i=1}^4 \sum_{j=1}^4 ( \int_{x_i}^{x_{i+1}}( EI \frac{d^2 \phi_i}{dx^2} \frac{d^2 \phi_j}{dx^2}\Delta_j + N^L \frac{d \phi_i}{dx} \frac{d \phi_j}{dx} \Delta_j) dx) \\
+m^e =  \sum_{i=1}^4 \sum_{j=1}^4 ( \int_{x_i}^{x_{i+1}} \rho \frac{d^2 \Delta_j}{dt^2} \phi_i \phi_j dx \\
+f^e =  \sum_{i=1}^4 ( \int_{x_i}^{x_{i+1}} \int_{x_i}^{x_{i+1}} \phi_i q(x,t) dx
+\end{align}
+\end{subequations}
+
+Assembly up, we obtain the whole structural system Matrix Format:
+
+$$ \sum_{ne} T^T m^e T \{ \ddot{\Delta} \} + \sum_{ne} T^T k^e T \{ \Delta \} = \sum_{ne} T^T f^e $$ 
+
+where $ne$ is the total number of elements, $T$ is the transformation matrix.
+
+Define global Mass Matrix, Stiff Matrix and Force Vector as
+
+$$ M = \sum_{ne} T^T m^e T $$
+$$ K = \sum_{ne} T^T k^e T $$
+$$ F = \sum_{ne} T^T f^e $$ 
+
+
+\subitem{4.2 Timosheko beam element}
+Interpolate $w, \theta$ respectively, linear shape function is easy but not gurantee strain continuity at node, as $E_{xx} = w_{,x}^2/2 - z \theta_{,x} $, both $w, \theta$ here have first derivatives. So the right thing is to construct shape function at least second order. So both $w, \theta$ need use Hermite shape function.
+  
+$$ w = \sum_{i=1}^4 \Delta_i N_i $$
+$$ \theta = \sum_{j=1}^4 \theta_j N_j $$
+
+where $N$ is shape function same as EB beam element.Taken into virtural work.
+
+note that $ \delta E_{xx} = w_{,x} \delta w_{,x} - z \delta \theta_{,x} $, for nonlinear term $ w_{,x}^2$, decompose it as $w_{,x}^L w_{,x}$, here $w_{,x}^L$ is known from last step.
+
+the element stiff matrix  
+
+$$
+(w_{,x}^L)^2 \begin{bmatrix} \frac{\partial N_i}{\partial x} \\ \frac{\partial \phi_i}{\partial x} \end{bmatrix} ^T \cdot \begin{bmatrix} \frac{\partial N_i}{\partial x} \\ \frac{\partial \phi_i}{\partial x} \end{bmatrix}
+$$
+the element mass matrix and element force vector are same as EB beam element, and matrix assembly is same as EB. 
+   
+\end{enumerate}
+
+\section{SPH fluid equation}
+
+assuming weak-compressible, the mass conservation equation is
+
+$$ \frac{d \rho}{dt} = - \rho \nabla  v $$
+
+momentum equation is 
+
+$$ \frac{dv}{dt} = - \frac{1}{\rho} \nabla P + \Gamma + g $$
+
+where $v$ is fluid particle velocity, and $\Gamma$ refers to dissipative terms and $ g=(0,0,-9.81) m/s^{-2} $. Basically two ways here to implement:
+
+\begin{enumerate}
+\item{artificial viscosity}
+artificial viscosity proposed by Monaghan(1992), the equation above is:
+
+$$  \frac{dv_i}{dt} = - \sum_{j} m_j (\frac{P_i}{\rho _i ^2} + \frac{P_j}{\rho_j ^2} + \Pi _{ij} ) \nabla_i W_{ij} + g $$
+
+where viscosity term $\Pi_{ij}$ is given by
+
+$$ \Pi_{ij} = \{ \begin{array}{c} \frac{-\alpha \bar{c_{ij}} \mu_{ij}}{\rho _{ij}} \; v_{ij} \cdot r_{ij} < 0 \\ 0 \;  v_{ij} \cdot r_{ij} > 0 \end{array} $$
+
+where $ \mu_{ij} = \frac{h v_{ij} r_{ij}}{ r_{ij}^2 + \eta ^2} $, $\eta^2 = 0.01 h^2$, $\bar{c_{ij}} = \frac{1}{2}(c_i+c_j)$ is the mean sound speed. $\alpha = 0.3$, $c=10$  for DamBreak case. 
+
+\item{laminar viscosity}
+proposed by Lo and Shao (2002)$$  \frac{dv_i}{dt} = - \sum_{j} m_j (\frac{P_i}{\rho _i ^2} + \frac{P_j}{\rho_j ^2}) \nabla_i W_{ij} + g + \sum_{j} \frac{4 \nu_0 r_{ij} \cdot \nabla_i w_{ij}}{(\rho_i + \rho_j)(r_{ij}^2+\eta^2)}v_{ij} $$
+$$  \frac{dv_i}{dt} = - \sum_{j} m_j (\frac{P_i}{\rho _i ^2} + \frac{P_j}{\rho_j ^2}) \nabla_i W_{ij} + g + \sum_{j} \frac{4 \nu_0 r_{ij} \cdot \nabla_i w_{ij}}{(\rho_i + \rho_j)(r_{ij}^2+\eta^2)}v_{ij} $$
+where $\nu_0$ is kinetic viscosity $ 10^{-6} m^2s^{-1} $
+
+\end{enumerate}
+
+choose Quadratic Kernel function
+
+$$w(r_{ij},h)  = \alpha_D [ \frac{3}{16} q^2 - \frac{3}{4} q + \frac{3}{4}] \; 0 \leq q \leq 2 $$
+
+the frist gradient is $ \nabla_i w_{ij} = \alpha_D (\frac{3}{8} q - \frac{3}{4})$
+
+where $ q= r_{ij}/h $, $alpha_D = \frac{2}{\pi h^2}$ for 2D case.
+
+For artificial viscosity, define
+
+$$ L = \sum_j \frac{m_j \alpha c_{ij}}{\rho _ {ij}} \frac{h r_{ij}}{r_{ij}^2 + \eta^2} \nabla_i w_{ij}$$ when $ v_{ij} \cdot r_{ij} < 0 $ else $ L =0 ,  v_{ij} \cdot r_{ij} > 0$
+
+For laminar viscosity, define
+$$ L = \sum_{j} \frac{4 \nu_0 r_{ij} \cdot \nabla_i w_{ij}}{(\rho_i + \rho_j)(r_{ij}^2+\eta^2)} $$ 
+
+and for both artificial viscosity and laminar viscosity, we have the term unrelated to velocity, defined as
+
+$$ RHS_0 =  - \sum_{j} m_j (\frac{P_i}{\rho _i ^2} + \frac{P_j}{\rho_j ^2}) \nabla_i W_{ij} + g $$
+
+so sph governing equation in matrix format is 
+$ \ddot{v_i} - L v_{ij} + RHS_0 $
+
+To update density of fluid particles, we use 
+
+$$ \frac{d \rho_i}{dt} = \sum_j m_j v_{ij} \nabla_i w_{ij} $$
+
+and to update pressure we use Monaghan(1994) state equation as
+
+$$ P = B[ (\frac{\rho}{\rho_0})^ \kappa - 1] $$
+
+where $\kappa = 7$, $B= c_0^2 \rho_0 /\kappa$, $\rho_0 = 1000 kgm^{-3}$ 
+
+we can see here, the update of particles density and pressure are not directly related to the coupled system. so these two parameters are not solve simultaneous with particle velocities $v$ in final.
+
+\section{coupled system approximation}
+
+here use EB beam element
+ $$ \begin{bmatrix} M && 0 \\ 0 && I \end{bmatrix} \{ \begin{array}{c} \ddot{\Delta_J} \\ \dot{v} \end{array} \} + \begin{bmatrix} K && 0 \\ 0 && L \end{bmatrix} \{ \begin{array}{c} \Delta_J \\ v \end{array} \} = \{ \begin{array}{c} f^{f2s}\\ f^{s2f}+RHS_0 \end{array} \} $$
+
+where $ \Delta_J$ stands for displacement in structural, $v$ stands for velocity of particles. 
+
+\section{Reference}
+% \bibliography
+
+
+\end{document}
