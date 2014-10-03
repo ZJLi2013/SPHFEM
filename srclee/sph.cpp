@@ -39,7 +39,7 @@ inline void SphFluidSolver :: add_density(Particle &particle, Particle &neighbou
 	neighbour.density += particle.mass*common;
 }
 
-inline void SphFluidSolver::sum_all_densities(list<Particle> p_list, Particle &particle)
+inline void SphFluidSolver::sum_all_densities(p_list, Particle &particle)
 {
 	for(list<Particle>::iterator piter = p_list.begin(); piter != p_list.end(); piter++)
 	{
@@ -48,7 +48,7 @@ inline void SphFluidSolver::sum_all_densities(list<Particle> p_list, Particle &p
 }
 
 
-inline void SphFluidSolver::update_densities(list<Particle> p_list)
+inline void SphFluidSolver::update_densities(p_list)
 {
 	for(list<Particle>::iterator piter = p_list.begin(); piter != p_list.end();piter++)
 		sum_all_densities(p_list, *piter);
@@ -129,17 +129,16 @@ void SphFluidSolver::update_particles()
 	update_particles();
 }
 
-void SphFluidSolver :: init_particles(Particle *particles, int count)
+list<Particle> SphFluidSolver :: init_particles(Particle *particles, int count)
 {
-//	Domain* Field = new Domain[1];		
-	for(int i = 0; i < count; i++)
+	for(int i = 0; i <= count; i++)
 	{       
-		p_list.push_back(*particles);
-		particles->id = i+1;	
-		particles->force = Vector2f(0.0f);
-		particles->viscosity = Vector2f(0.0f);
-		particles->velocity = Vector2f(0.0f);
+		particles[i].id = i+1;	
+		particles[i].force = Vector2f(0.0f);
+		particles[i].viscosity = Vector2f(0.0f);
+		particles[i].velocity = Vector2f(0.0f);
+		pp_list.push_back(*particles);
 		particles++;
 	}
+	return pp_list;
 }
-

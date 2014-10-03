@@ -26,21 +26,14 @@ struct Particle {
 	}
 };
 
-/*struct Domain{
-	list<Particle> particles;
-};
-*/
-
 class SphFluidSolver {
-//	const float domain_width;
-//	const float domain_height;
 	private:
 	const float hsml;  // smoothed length
 	const float timestep;
 	const float vsp; //velocity of sound speed
 
 	public:
-	list<Particle> p_list; 	
+	list<Particle> pp_list; 
 
 	public:
 SphFluidSolver(	float hsml,
@@ -52,7 +45,7 @@ SphFluidSolver(	float hsml,
 
 void update(list<Particle> p_list);
 
-void init_particles(Particle *particles, int count);
+list<Particle> init_particles(Particle *particles, int count);
 
 void update_boundary_force(list<Particle> p_list, list<Particle> bcp_list);
 
@@ -88,10 +81,6 @@ void update_particle(Particle &particle);
 
 void update_particles();
 
-/*void reset_particle(Particle &particle);
-
-void reset_particles():
-*/
 };
 #endif
 
