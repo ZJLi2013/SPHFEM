@@ -21,7 +21,7 @@ int main()
 
 	list<Particle> fp_list = solver.init_particles(InitParticles, count);
 	list<Particle> bcp_list = solver.init_particles(InitBcParticles,bc_count);
-
+	
 	double simulation_time(0.1);
 	int totsteps = int(simulation_time/TS);
 
@@ -29,8 +29,9 @@ int main()
 	{
 		solver.update_boundary_force(fp_list, bcp_list);
 		solver.update(fp_list);
-		
+
 		if( (i%10)==0)
-			Project.display(i,particles,bcparticles);
+			Project.display(i,fp_list,bcp_list);
 	}
+	return 0;
 }

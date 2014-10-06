@@ -34,9 +34,10 @@ int main()
 	int np = npx*npz - width*height;
 	Particle *particles = new Particle[np];
 	Particle *ptr = particles;
-	string file_name = "RecHollow.vtu";
+	string file_name = "RecHollow2.vtu";
 	ofstream fid(file_name);
 
+		cout << "Np " << np << endl;
 
 	   	for(int i=1; i<=np; i++)
 	{
@@ -54,22 +55,20 @@ int main()
 	   fid << "<DataArray type= \"Float32\" Name = \"Position\"  NumberOfComponents= \"3\" format=\"ascii\">\r\n";
 	   fid << "\r\n";	 
 	   
-	   int index1=0;
 	   int raw1=0, col1=0;
 	   for(int j=1; j<=npx; j++)
 		   for(int i=1; i<=npz; i++)
 		   {
 			if( i!=left && i!=left+1 && i!=left+2  ||  (j>height))
 			{
-		                particles++;     
 				if(j<=height)
 				{
-		                	 raw1=(particles->id)%(npx-width);
+		                	 raw1=(particles->id+1)%(npx-width);
 					 col1=(int) floor((particles->id)/(npx-width));
 				}
 				else
-				{	  raw1=(particles->id)%npx;
-					  col1=(int) floor((particles->id)/npx);
+				{	  raw1=(particles->id - height*(npx-width))%npx;
+					  col1=(int) floor((particles->id - height*(npx-width))/npx) + height;
 				}
 
 			if(raw1==0)
@@ -80,24 +79,18 @@ int main()
 			{ 
 				if(j<=height && i >= left+3)
 				{
-					particles->position.x = (raw1-1)*dx+ dx*(width+1);
+					particles->position.x = (raw1-1)*dx+ dx*(width);
 					particles->position.z = col1*dz;
-					//cout << "if raw  = " << raw << endl;
-					//cout <<  "if j= " << j << " i= " << i << " " << "px " <<particles->position.x<<"pz "<<particles->position.z << endl;
 				}
 				else{	
 					particles->position.x = (raw1-1)*dx;
-			//		cout << "ELSE raw  = " << raw << endl;
 					particles->position.z = col1*dz;
-	//cout << "else j= " << j << " i= " << i << " " << "px " <<particles->position.x<<"pz "<<particles->position.z << endl;
 				    }	
 			}
                         fid <<setprecision(6)<< particles->position.x << " "<<setprecision(6)<< particles->position.z << " " << 0 << endl;
-			index1++;
+		        particles++;     
 			}
 		   }
-	  cout << "index1 " << index1 << endl;
-
 	  fid <<"</DataArray>\r\n";
 	  fid << "\r\n";
 	  fid << "</PointData>\r\n";
@@ -106,22 +99,20 @@ int main()
 	  fid << "<Points>\r\n" << endl;
 	  fid << "<DataArray type= \"Float32\" Name = \"Position\"  NumberOfComponents= \"3\" format=\"ascii\">\r\n";
 	  fid << "\r\n";
-	  int index2=0; 
 	  int raw2=0, col2=0;
 	  for(int j=1; j<=npx; j++)
 		   for(int i=1; i<=npz; i++)
 		{
 			if( (i != left) && (i != left+1) && (i != left+2) ||  (j > height)) 
 			{
-	      	   		ptr++;
 				if(j<=height)
 				{
-		                	 raw2=(particles->id)%(npx-width);
+		                	 raw2=(particles->id+1)%(npx-width);
 					 col2=(int) floor((particles->id)/(npx-width));
 				}
 				else
-				{	  raw2=(particles->id)%npx;
-					  col2=(int) floor((particles->id)/npx);
+				{	  raw2=(particles->id - height*(npx-width))%npx;
+					  col2=(int) floor((particles->id - height*(npx-width))/npx) + height;
 				}
 
 				if( raw2 ==0)
@@ -131,7 +122,7 @@ int main()
 				}else
 				{	if(j<=height && i >= left+3)
 					{
-					particles->position.x = (raw2-1)*dx+ dx*(width+1);
+					particles->position.x = (raw2-1)*dx+ dx*(width);
 					particles->position.z = col2*dz;
 					}
 					else{	
@@ -140,10 +131,9 @@ int main()
 				    	}	
 				}
 		        fid <<setprecision(6)<< ptr->position.x << " "<<setprecision(6)<< ptr->position.z << " " << 0 << endl;
-           			index2++;
+	      	   		ptr++;
 				}
 		}
-	  cout << "index2 " << index2 << endl;
    	  fid << "\r\n";
           fid << "</DataArray>\r\n";
 	  fid << "</Points>\r\n";

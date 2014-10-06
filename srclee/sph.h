@@ -32,9 +32,9 @@ class SphFluidSolver {
 	const float timestep;
 	const float vsp; //velocity of sound speed
 
-	public:
-	list<Particle> pp_list; 
-
+/*	public:
+	list<Particle> p_list; 
+*/
 	public:
 SphFluidSolver(	float hsml,
 		float timestep) 
@@ -50,7 +50,7 @@ list<Particle> init_particles(Particle *particles, int count);
 void update_boundary_force(list<Particle> p_list, list<Particle> bcp_list);
 
 template <typename Function>
-	void foreach_particle(Function function){
+	void foreach_particle(Function function, list<Particle> p_list){
 		list<Particle> &plist = p_list;
 		for(list<Particle>::iterator piter = plist.begin(); piter !=plist.end(); piter++){
 			function(*piter);
@@ -79,7 +79,7 @@ void boundary_force(Particle &particle, list<Particle> bcp_list);
 
 void update_particle(Particle &particle);
 
-void update_particles();
+void update_particles(list<Particle> p_list);
 
 };
 #endif

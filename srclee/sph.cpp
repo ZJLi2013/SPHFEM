@@ -1,7 +1,7 @@
 #include "sph.h"
 #include <cstdio>
 #include <iostream>
-
+#include <list>
 using namespace std;
 
 #define PI_FLOAT  3.141592653589793f
@@ -39,19 +39,19 @@ inline void SphFluidSolver :: add_density(Particle &particle, Particle &neighbou
 	neighbour.density += particle.mass*common;
 }
 
-inline void SphFluidSolver::sum_all_densities(p_list, Particle &particle)
+inline void SphFluidSolver::sum_all_densities(list<Particle> pp_list, Particle &particle)
 {
-	for(list<Particle>::iterator piter = p_list.begin(); piter != p_list.end(); piter++)
+	for(list<Particle>::iterator piter = pp_list.begin(); piter != pp_list.end(); piter++)
 	{
 		add_density(particle,*piter);
 	}
 }
 
 
-inline void SphFluidSolver::update_densities(p_list)
+inline void SphFluidSolver::update_densities(list<Particle> pp_list)
 {
-	for(list<Particle>::iterator piter = p_list.begin(); piter != p_list.end();piter++)
-		sum_all_densities(p_list, *piter);
+	for(list<Particle>::iterator piter = pp_list.begin(); piter != pp_list.end();piter++)
+		sum_all_densities(pp_list, *piter);
 }
 
 inline void SphFluidSolver::add_force(Particle &particle, Particle &neighbour)
@@ -91,19 +91,19 @@ inline void SphFluidSolver::add_force(Particle &particle, Particle &neighbour)
 
 
 // this subroutine is used to calcualate forces acting on one particle
-void SphFluidSolver::sum_all_forces(list<Particle> p_list, Particle &particle)
+void SphFluidSolver::sum_all_forces(list<Particle> pp_list, Particle &particle)
 {
-	for(list<Particle>::iterator piter =p_list.begin(); piter !=p_list.end(); piter++)
+	for(list<Particle>::iterator piter =pp_list.begin(); piter !=pp_list.end(); piter++)
 	{
 		add_force(particle,*piter);
 	}
 }
 
 // this subroutine calculate forces acting on all particles in the domain
-void SphFluidSolver::update_forces(list<Particle> p_list)
+void SphFluidSolver::update_forces( list<Particle> pp_list)
 {
-	for (list<Particle>::iterator piter = p_list.begin(); piter != p_list.end(); piter++){
-	sum_all_forces(p_list, *piter);
+	for (list<Particle>::iterator piter = pp_list.begin(); piter != pp_list.end(); piter++){
+	sum_all_forces(pp_list, *piter);
 	}
 }
 
@@ -114,30 +114,32 @@ void SphFluidSolver::update_particle(Particle &particle)
 	particle.position += timestep * particle.velocity;
 }
 
-void SphFluidSolver::update_particles()
+void SphFluidSolver::update_particles( list<Particle> pp_list)
 {
-	for(list<Particle>::iterator piter=p_list.begin(); piter != p_list.end(); piter++)
+	for(list<Particle>::iterator piter=pp_list.begin(); piter != pp_list.end(); piter++)
 	{
 		update_particle(*piter);
 	}
 }
 
-	void SphFluidSolver::update(list<Particle> p_list)
+	void SphFluidSolver::update(list<Particle> pp_list)
 {	
-	update_densities(p_list);
-	update_forces(p_list);
-	update_particles();
+	update_densities(pp_list);
+	update_forces(pp_list);
+	update_particles(pp_list);
 }
 
 list<Particle> SphFluidSolver :: init_particles(Particle *particles, int count)
 {
+	list<Particle> pp_list;
+
 	for(int i = 0; i <= count; i++)
 	{       
 		particles[i].id = i+1;	
 		particles[i].force = Vector2f(0.0f);
 		particles[i].viscosity = Vector2f(0.0f);
 		particles[i].velocity = Vector2f(0.0f);
-		pp_list.push_back(*particles);
+	 	pp_list.push_back(*particles);
 		particles++;
 	}
 	return pp_list;

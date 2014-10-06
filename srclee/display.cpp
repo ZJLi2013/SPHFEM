@@ -1,12 +1,13 @@
 #include<iostream>
 #include<fstream>
 #include<string>
+#include<list>
 #include<iomanip>
+#include "SphSystem.h"
 
-#include "SphSystem.h "
 using namespace std;
 
-void SphSystem::display(int istep, Particle *particles, Particle *bcparticles )
+void SphSystem::display(int istep, list<Particle> particles, list<Particle> bcparticles )
 {
 	string file_name;
 
@@ -32,17 +33,17 @@ void SphSystem::display(int istep, Particle *particles, Particle *bcparticles )
 	fid << "<PointData Scalars=\"Pressure\" Vectors=\"Velocity\">\r\n"<<endl;;
 	fid << "<DataArray type=\"Float32\" Name=\"Pressure\" format=\"ascii\">\r\n"<<endl;
 	// pressure of fluid particles
-	for(int i=1;i<=count;i++)
+	for(list<Particle>::iterator ip=particles.begin(); ip!=particles.end(); ip++)
 	{
 		
-		fid<< setprecision(6)<<particle(i)->pressure<< " ";
+		fid<< setprecision(6)<< ip->pressure << " ";
 	}
 	fid << "\r\n"<< endl;
 	//presure of bc particles
-	for(int i=1;i<=bc_count;i++)
+	for(list<Particle>::iterator ip=bcparticles.begin(); ip!=bcparticles.end(); ip++)
 	{
 		
-		fid<< setprecision(6)<<bcparticle(i)->pressure<< " ";
+		fid<< setprecision(6)<<ip->pressure<< " ";
 	}
 	fid << "\r\n";
 	fid << "</DataArray>\r\n"<<endl;
@@ -50,15 +51,15 @@ void SphSystem::display(int istep, Particle *particles, Particle *bcparticles )
 	//write density data
 	fid << "<DataArray type=\"Float32\" Name=\"Density\" format=\"ascii\">\r\n";
 	//density of fluid particles
-	for(int i=1;i<=count;i++)
+	for(list<Particle>::iterator ip=particles.begin(); ip!=particles.end(); ip++)
 	{
-		fid << setprecision(6)<< particle(i)->density<< " ";
+		fid << setprecision(6)<< ip->density<< " ";
 	}
 	fid << "\r\n" << endl;
 	//density of bc particles
-	for(int i=1;i<=bc_count;i++)
+	for(list<Particle>::iterator ip=bcparticles.begin(); ip!=bcparticles.end(); ip++)	
 	{
-		fid << setprecision(6)<< bcparticle(i)->density<< " ";
+		fid << setprecision(6)<< ip->density<< " ";
 	}
 	fid << "\r\n";
 	fid << "</DataArray>\r\n";
@@ -66,13 +67,13 @@ void SphSystem::display(int istep, Particle *particles, Particle *bcparticles )
 	//write velocity data
 	fid << "<DataArray type=\"Float32\" Name=\"Velocity\" NumberOfComponents=\"3\" format=\"ascii\">\r\n";
 	//veclotiy of fluid partilces
-	for(int i=1;i<=count;i++)
+	for(list<Particle>::iterator ip=particles.begin(); ip!=particles.end(); ip++)	
 	{
-		fid << setprecision(8)<<particle(i)->velocity.x <<setprecision(8) << particle(i)->velocity.z << " ";
+		fid << setprecision(8)<< ip->velocity.x <<setprecision(8) << ip->velocity.z << " ";
 	}
 	fid <<"\r\n"<<endl;
 	//velocity of bc particles
-	for(int i=1; i<=bc_count; i++)
+	for(int i=1; i<bc_count;i++)
 	{
 		fid << setprecision(8)<<0.0 <<setprecision(8) << 0.0 << " ";
 	}
@@ -84,17 +85,15 @@ void SphSystem::display(int istep, Particle *particles, Particle *bcparticles )
 	fid << "<Points>\r\n" ;
 	fid << "<DataArray type= \"Float32\" NumberOfComponents= \"2\" format=\"ascii\">\r\n";
 	//position for fluid particles
-	for(int i=1;i<=count;i++)
+	for(list<Particle>::iterator ip=particles.begin(); ip!=particles.end(); ip++)	
 	{
-
-		 fid<<setprecision(8)<<particles->position.x <<setprecision(8)<< particles->position.z << " ";
+		 fid<<setprecision(8)<< ip->position.x <<setprecision(8)<< ip->position.z << " ";
 	}
 	fid << "\r\n" << endl;
-	//position for fluid particles
-	for(int i=1;i<=bc_count;i++)
+	//position for bc particles
+	for(list<Particle>::iterator ip=bcparticles.begin(); ip!=bcparticles.end(); ip++)	
 	{
-
-		 fid<<setprecision(8)<<bcparticles->position.x <<setprecision(8)<< bcparticles->position.z << " ";
+		 fid<<setprecision(8)<< ip->position.x <<setprecision(8)<< ip->position.z << " ";
 	}
 	fid << "\r\n";
 	fid << "</DataArray>\r\n";
@@ -152,7 +151,6 @@ void SphSystem::display(int istep, Particle *particles, Particle *bcparticles )
 	fid << "</VTKF<=";
 	
 	fid.close();
-	return 0;
 }
 
 		

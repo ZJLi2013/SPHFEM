@@ -1,7 +1,8 @@
 #include "Vector.h"
 #include "sph.h"
+#include<list>
 #include<cmath> // cos, sqrt fabs
-
+using namespace std;
 #define PI 3.1415926535897
 
 void SphFluidSolver::boundary_force(Particle &particle,list<Particle> bcp_list) {

@@ -9,3 +9,23 @@ Triangular::Triangular(const Triangular &rhs)
    _next(rhs._beg_pos-1)
   {}
 
+Oct 3
+here we use SphSystem to manage the Particles/bcParticles data, and SphSolver use these pointers to operator on them
+
+Oct 5
+check the functions to make conform
+
+-------------- link error in g++ -------------
+
+- which object file inside a shared library is caused the error ? 
+
+basic knowledge first: 
+by the time hthe (shared) library has been linked, all object fiels have been fused together", and no longer exist inside the shared library as separate entities.
+
+Second:
+do debug fuild  -g, the linker will tell you which source file and line is causing the problme
+
+Third:
+ask the linker: rebuild the libraray by -y
+
+

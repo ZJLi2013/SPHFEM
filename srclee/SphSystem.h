@@ -8,20 +8,21 @@ class SphSystem{
 	const int npx, npz;
 	const double dx, dz;
 
-	void InitFluidPosition();
+	void InitFluidPosition(Particle* particles);
 
-	void InitBCPosition();
+	void InitBCPosition(Particle* bcparticles);
 
 
 	 public:
-	Particle* particles, bcparticles;
+	Particle* particles;
+	Particle* bcparticles;
 
 	SphSystem(	int count,
 		int bc_count,
 		int npx,
 		int npz,
-		int dx,
-		int dz)
+		double dx,
+		double dz)
 	:count(count),
 	 bc_count(bc_count),
 	 npx(npx),
@@ -32,8 +33,8 @@ class SphSystem{
 
 	void init_sphsystem();
 
-	void display(int istep, Particle *particles, Particle *bcparticles);
-}
+	void display(int istep, list<Particle>  particles, list<Particle> bcparticles);
+};
 
 
 
