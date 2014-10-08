@@ -12,3 +12,5 @@ Case 1 is called by default; Case 2 can be called during compiling as:
 
 gcc -D CASE2 SphSystem.cpp -c SysSystem.o
 
+Oct 10
+fixed linking error and run the case, while the results didn't make sense, check later
