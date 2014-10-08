@@ -6,11 +6,11 @@ void SphSystem:: init_sphsystem()
 {
 
 	/* initial fluid partical */
-	Particle *particles = new Particle[count];
+	particles = new Particle[count];
 	InitFluidPosition(particles);
 	
 	/* initial bc particals */
-	Particle *bcparticles = new Particle[bc_count];
+	bcparticles = new Particle[bc_count];
 	InitBCPosition(bcparticles);
 }
 
@@ -33,7 +33,6 @@ void SphSystem::InitFluidPosition(Particle* particles)
 		   {
 			if( i!=left && i!=left+1 && i!=left+2  ||  (j>height))
 			{
-				index1++;
 				if(j<=height)
 				{
 		                	 raw1=(particles->id+1)%(npx-width);
