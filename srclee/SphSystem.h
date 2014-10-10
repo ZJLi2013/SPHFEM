@@ -7,15 +7,17 @@ class SphSystem{
 	const int count, bc_count; 
 	const int npx, npz;
 	const double dx, dz;
+//	Particle* particles;
+//	Particle* bcparticles;
 
-	void InitFluidPosition(Particle* particles);
+	void InitFluidPosition(Particle*); //particles
 
-	void InitBCPosition(Particle* bcparticles);
+	void InitBCPosition(Particle*); //bcparticles
 
 
 	 public:
-	Particle* particles;
-	Particle* bcparticles;
+	Particle* InitParticles;
+	Particle* InitBcParticles;
 
 	SphSystem(	int count,
 		int bc_count,

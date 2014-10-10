@@ -1,22 +1,28 @@
 #include <math.h>  // floor fun
 #include "sph.h"
 #include "SphSystem.h"
+//#include <iostream>
+//using namespace std;
 
 void SphSystem:: init_sphsystem()
 {
 
 	/* initial fluid partical */
-	particles = new Particle[count];
+	Particle* particles = new Particle[count];
+	InitParticles = particles; // this pointer will be send to sphsolver;
 	InitFluidPosition(particles);
 	
 	/* initial bc particals */
-	bcparticles = new Particle[bc_count];
+	Particle* bcparticles = new Particle[bc_count];
+	InitBcParticles = bcparticles;
 	InitBCPosition(bcparticles);
 }
-
 void SphSystem::InitFluidPosition(Particle* particles)
-{
-
+{	
+	for(int i =0; i <count; i++)
+	{       
+		particles[i].id = i+1;	
+ 	}		
 	//npz(41), npx(41)
 	   #ifdef CASE2	
 	{ //case2:: rectangular with shallow
@@ -66,10 +72,12 @@ void SphSystem::InitFluidPosition(Particle* particles)
 	  #else
 	{  //case 1::rectangular
 	  	int np=count;
+		int raw=0,  col=0; 
 	       	for(int i=1; i<=npx; i++)
 		   for(int j=1; j<=npz; j++)
 		   {
-		                particles++;     
+		         //Oct 8, should put it at last line
+		    	        particles++;     
 		                int raw=(particles->id)%npx;
 				int col=(int) floor((particles->id)/npx);
 			if(raw==0)
@@ -80,6 +88,8 @@ void SphSystem::InitFluidPosition(Particle* particles)
 			{
 				particles->position.x = (raw-1)*dx;
 				particles->position.z = col*dz;
+				//test Oct 8 ( partilcles->position should be correct)
+				//cout << " particle->position ( " << particles->position.x << ", " << particles->position.z << " )" << endl;	
 			}
 		   }
 	}
@@ -89,6 +99,11 @@ void SphSystem::InitFluidPosition(Particle* particles)
 void SphSystem::InitBCPosition(Particle* bcparticles)
 {
 
+	for(int i =0; i < bc_count; i++)
+	{       
+		bcparticles[i].id = i+1;	
+ 	}		
+	
 	#ifdef CASE2
 	{	
 	//	int npz(83), npx(81), width(5), height(43);

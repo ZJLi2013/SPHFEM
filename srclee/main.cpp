@@ -5,24 +5,18 @@
 #define TS 0.0001 //timestep
 int main() 
 {
-	int count(1600), bc_count(320), npx(40), npz(40);
+	int count(1681), bc_count(328), npx(41), npz(41);
 
 	SphSystem Project(count, bc_count, npx, npz,HSML, HSML);
 	SphFluidSolver solver(HSML,TS);
 
 	//initial particles(fluid and bc);
 	Project.init_sphsystem();
-	Particle* particles = Project.particles;
-	Particle* bcparticles = Project.bcparticles;
-
-	//send the pointers to init_particles 
-	Particle* InitParticles = particles;
-	Particle* InitBcParticles = bcparticles;
-
-	list<Particle> fp_list = solver.init_particles(InitParticles, count);
-	list<Particle> bcp_list = solver.init_particles(InitBcParticles,bc_count);
 	
-	double simulation_time(0.1);
+	list<Particle> fp_list = solver.init_particles(Project.InitParticles, count);
+	list<Particle> bcp_list = solver.init_particles(Project.InitBcParticles,bc_count);
+	
+	double simulation_time(0.0001);
 	int totsteps = int(simulation_time/TS);
 
 	for(int i=0; i<totsteps; i++)

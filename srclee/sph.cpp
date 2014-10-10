@@ -133,13 +133,15 @@ list<Particle> SphFluidSolver :: init_particles(Particle *particles, int count)
 {
 	list<Particle> pp_list;
 
-	for(int i = 1; i <= count; i++)
+	for(int i =0; i <count; i++)
 	{       
-		particles[i].id = i+1;	
+//		particles[i].id = i+1;	
 		particles[i].force = Vector2f(0.0f);
 		particles[i].viscosity = Vector2f(0.0f);
 		particles[i].velocity = Vector2f(0.0f);
-	 	pp_list.push_back(*particles);
+	// 	pp_list.push_back(*particles);
+	// 	modify Oct 9
+		pp_list.push_back(particles[i]);
 //		particles++;
 	}
 	return pp_list;
