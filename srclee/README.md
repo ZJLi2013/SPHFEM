@@ -23,3 +23,10 @@ Change one:  make the SphSystem member data ( particles, bcparticels be local va
 Change two:  in SphFluidSolver::init_particles  pp_list.push_back(particles[i])
 
 One more thing is the starting point of list (0, 1)
+
+Oct 21
+so this is the first debug version, fixed 3 things:
+
+1 implicit type change e.g.  3/16 -> 3./16   
+2 parameters transfered by reference, rather than by (value) copy, which if so will not update particle properties as we wish
+3 adding boundary wall direction vectors for boundary force caluculation,using std::vector to support random access
