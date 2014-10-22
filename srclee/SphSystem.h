@@ -1,5 +1,7 @@
 #include "Vector.h"
+#include <vector>
 #include "sph.h"
+
 
 class SphSystem{
 
@@ -18,6 +20,10 @@ class SphSystem{
 	 public:
 	Particle* InitParticles;
 	Particle* InitBcParticles;
+	Particle* BcVector = InitBcParticles;
+//* add wall tangent vector, normal vector
+	std::vector<Vector2f> wall_tang, wall_normal;
+
 
 	SphSystem(	int count,
 		int bc_count,
@@ -37,6 +43,6 @@ class SphSystem{
 
 	void display(int istep, list<Particle>  particles, list<Particle> bcparticles);
 };
+	void WallVector(); //(Particle* BcVector:, int bc_count);
 
-
-
+	

@@ -1,8 +1,6 @@
 #include <math.h>  // floor fun
 #include "sph.h"
 #include "SphSystem.h"
-//#include <iostream>
-//using namespace std;
 
 void SphSystem:: init_sphsystem()
 {
@@ -77,7 +75,7 @@ void SphSystem::InitFluidPosition(Particle* particles)
 		   for(int j=1; j<=npz; j++)
 		   {
 		         //Oct 8, should put it at last line
-		    	        particles++;     
+		//    	        particles++;     
 		                int raw=(particles->id)%npx;
 				int col=(int) floor((particles->id)/npx);
 			if(raw==0)
@@ -91,6 +89,7 @@ void SphSystem::InitFluidPosition(Particle* particles)
 				//test Oct 8 ( partilcles->position should be correct)
 				//cout << " particle->position ( " << particles->position.x << ", " << particles->position.z << " )" << endl;	
 			}
+		  	   	particles++;
 		   }
 	}
 	#endif
@@ -165,7 +164,8 @@ void SphSystem::InitBCPosition(Particle* bcparticles)
    	
 	for( int i=0; i< bcnp; i++)
 	 {
-		   bcparticles++;		 
+		   //put in last line
+		   //bcparticles++;		 
 		   if(i< bcnp/4)//bottom
 		   {
 		   	bcparticles->position.z = 0.0;
@@ -183,7 +183,7 @@ void SphSystem::InitBCPosition(Particle* bcparticles)
 			   bcparticles->position.x = 0.000;
 			   bcparticles->position.z = (bcnp - bcparticles->id) * bcdz;
 		  }
-		 
+		    bcparticles++;		 
 	}
 	}
 	#endif

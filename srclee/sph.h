@@ -1,4 +1,5 @@
 #include<list>
+#include<vector>
 
 using namespace std;
 
@@ -43,14 +44,14 @@ SphFluidSolver(	float hsml,
    vsp(10.0)	{
   }
 
-void update(list<Particle> p_list);
+void update(list<Particle>& p_list);
 
 list<Particle> init_particles(Particle *particles, int count);
 
-void update_boundary_force(list<Particle> p_list, list<Particle> bcp_list);
+void update_boundary_force(list<Particle>& p_list, list<Particle>& bcp_list, vector<Vector2f>& wall_tang, vector<Vector2f>& wall_normal);
 
 template <typename Function>
-	void foreach_particle(Function function, list<Particle> p_list){
+	void foreach_particle(Function function, list<Particle>& p_list){
 		list<Particle> &plist = p_list;
 		for(list<Particle>::iterator piter = plist.begin(); piter !=plist.end(); piter++){
 			function(*piter);
@@ -65,21 +66,21 @@ Vector2f gradient_kernel(const Vector2f &r, const float h);
 
 void add_density(Particle &particle, Particle &neighbour);
 
-void sum_all_densities(list<Particle>, Particle &particle);
+void sum_all_densities(list<Particle>&, Particle &particle);
 
-void update_densities(list<Particle>);
+void update_densities(list<Particle>&);
 
 void add_force(Particle &particle, Particle &neighbour);
 
-void sum_all_forces(list<Particle>, Particle &particle);
+void sum_all_forces(list<Particle>& , Particle &particle);
 
-void update_forces(list<Particle> p_list);
+void update_forces(list<Particle>& p_list);
 
-void boundary_force(Particle &particle, list<Particle> bcp_list);
+void boundary_force(Particle &particle, list<Particle>& bcp_list, vector<Vector2f>& wall_tang, vector<Vector2f>& wall_normal);
 
 void update_particle(Particle &particle);
 
-void update_particles(list<Particle> p_list);
+void update_particles(list<Particle>& p_list);
 
 };
 #endif

@@ -12,7 +12,7 @@ inline float SphFluidSolver :: kernel(const Vector2f &r, const float h)
 	const float alpha = 2/PI_FLOAT/square(h);
 	const float q = length(r)/h;
 	if(0<= q && q <= 2)
-		return alpha * (3/16 * square(q) - 3/4 * q + 3/4);
+		return alpha * (3./16 * square(q) - 3./4 * q + 3./4);
 	 else
 		return 0;
 }
@@ -22,7 +22,7 @@ inline Vector2f SphFluidSolver:: gradient_kernel(const Vector2f &r, const float 
 	const float alpha = 2/PI_FLOAT/square(h);
 	const float q = length(r)/h;
 	if(0<=q && q<= 2)
-		return alpha*(3/8*q - 3/4)* r/ length(r);
+		return alpha*(3./8*q - 3./4)* r/ length(r);
 	 else
 		return Vector2f(0.0f);
 }
@@ -39,7 +39,7 @@ inline void SphFluidSolver :: add_density(Particle &particle, Particle &neighbou
 	neighbour.density += particle.mass*common;
 }
 
-inline void SphFluidSolver::sum_all_densities(list<Particle> pp_list, Particle &particle)
+inline void SphFluidSolver::sum_all_densities(list<Particle>& pp_list, Particle &particle)
 {
 	for(list<Particle>::iterator piter = pp_list.begin(); piter != pp_list.end(); piter++)
 	{
@@ -48,7 +48,7 @@ inline void SphFluidSolver::sum_all_densities(list<Particle> pp_list, Particle &
 }
 
 
-inline void SphFluidSolver::update_densities(list<Particle> pp_list)
+inline void SphFluidSolver::update_densities(list<Particle>& pp_list)
 {
 	for(list<Particle>::iterator piter = pp_list.begin(); piter != pp_list.end();piter++)
 		sum_all_densities(pp_list, *piter);
@@ -57,16 +57,16 @@ inline void SphFluidSolver::update_densities(list<Particle> pp_list)
 inline void SphFluidSolver::add_force(Particle &particle, Particle &neighbour)
 {
 	if(particle.id >= neighbour.id) return;
-	Vector2f r = particle.position - particle.position;
-	Vector2f v = particle.velocity - particle.velocity;
+	Vector2f r = particle.position - neighbour.position;
+	Vector2f v = particle.velocity - neighbour.velocity;
 	if(dot(r,r)> square(hsml)) return;
 /* compute pressrue force */
 	Vector2f common = (neighbour.pressure / square(neighbour.density) + particle.pressure / square(particle.density)) * gradient_kernel(r, hsml);
 	particle.force += -neighbour.mass*common;
-	particle.pressure += -neighbour.mass*common.x; 
+//	particle.pressure += -neighbour.mass*common.x; 
 // wether pressure is scalar or vector?
 	neighbour.force -= -particle.mass*common;
-	neighbour.pressure -= -particle.mass*common.x;
+//	neighbour.pressure -= -particle.mass*common.x;
 
 /*compute viscosity force by artificial viscosity given by Monaghan 1992 */
         float const alpha = 0.1 ;
@@ -91,7 +91,7 @@ inline void SphFluidSolver::add_force(Particle &particle, Particle &neighbour)
 
 
 // this subroutine is used to calcualate forces acting on one particle
-void SphFluidSolver::sum_all_forces(list<Particle> pp_list, Particle &particle)
+void SphFluidSolver::sum_all_forces(list<Particle>& pp_list, Particle &particle)
 {
 	for(list<Particle>::iterator piter =pp_list.begin(); piter !=pp_list.end(); piter++)
 	{
@@ -100,7 +100,7 @@ void SphFluidSolver::sum_all_forces(list<Particle> pp_list, Particle &particle)
 }
 
 // this subroutine calculate forces acting on all particles in the domain
-void SphFluidSolver::update_forces( list<Particle> pp_list)
+void SphFluidSolver::update_forces( list<Particle>& pp_list)
 {
 	for (list<Particle>::iterator piter = pp_list.begin(); piter != pp_list.end(); piter++){
 	sum_all_forces(pp_list, *piter);
@@ -114,7 +114,7 @@ void SphFluidSolver::update_particle(Particle &particle)
 	particle.position += timestep * particle.velocity;
 }
 
-void SphFluidSolver::update_particles( list<Particle> pp_list)
+void SphFluidSolver::update_particles( list<Particle>& pp_list)
 {
 	for(list<Particle>::iterator piter=pp_list.begin(); piter != pp_list.end(); piter++)
 	{
@@ -122,7 +122,7 @@ void SphFluidSolver::update_particles( list<Particle> pp_list)
 	}
 }
 
-	void SphFluidSolver::update(list<Particle> pp_list)
+	void SphFluidSolver::update(list<Particle>& pp_list)
 {	
 	update_densities(pp_list);
 	update_forces(pp_list);
