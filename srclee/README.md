@@ -12,5 +12,14 @@ Case 1 is called by default; Case 2 can be called during compiling as:
 
 gcc -D CASE2 SphSystem.cpp -c SysSystem.o
 
-Oct 10
+Oct 8
 fixed linking error and run the case, while the results didn't make sense, check later
+
+Oct 9
+fixed running error of initialization. 
+
+Change one:  make the SphSystem member data ( particles, bcparticels be local variables at init_sphsytem()
+
+Change two:  in SphFluidSolver::init_particles  pp_list.push_back(particles[i])
+
+One more thing is the starting point of list (0, 1)
