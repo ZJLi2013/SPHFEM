@@ -7,12 +7,13 @@ void SphSystem:: init_sphsystem()
 
 	/* initial fluid partical */
 	Particle* particles = new Particle[count];
-	InitParticles = particles; // this pointer will be send to sphsolver;
+	InitParticles = particles; // this pointer will be send to solver.init_particles;
 	InitFluidPosition(particles);
 	
 	/* initial bc particals */
 	Particle* bcparticles = new Particle[bc_count];
-	InitBcParticles = bcparticles;
+	InitBcParticles = bcparticles; // this pointer wil be sent to solver.init_particles used for B.C. particle initialization
+	BcVector = InitBcParticles; // this pointer will be sent to WallVector
 	InitBCPosition(bcparticles);
 }
 void SphSystem::InitFluidPosition(Particle* particles)
@@ -67,7 +68,7 @@ void SphSystem::InitFluidPosition(Particle* particles)
 		   }
 
 	   }
-	  #else
+	  #ifdef CASE1
 	{  //case 1::rectangular
 	  	int np=count;
 		int raw=0,  col=0; 
@@ -91,6 +92,21 @@ void SphSystem::InitFluidPosition(Particle* particles)
 			}
 		  	   	particles++;
 		   }
+	}
+	#else 
+	{
+		//debug case (with 4 fluid particles and 12 bc particles around)
+		for(int i=1; i<=npx; i++)
+			for(int j=1; j<=npz; j++)
+			{
+				int raw = (particles->id+1)%npx;
+				int col = (int) floor((particles->id)/npx);
+	
+				particles->position.x = raw*dx;
+				particles->position.z = col*dz;
+
+				particles++;
+			}
 	}
 	#endif
 }
@@ -155,7 +171,7 @@ void SphSystem::InitBCPosition(Particle* bcparticles)
 		 
 	}
 	
-	#else
+	#ifdef CASE1
 	{
 	int bcnpz(npz*2-1), bcnpx(npz*2-1);
 	double bcdx=dx/2, bcdz=dz/2;
@@ -186,13 +202,39 @@ void SphSystem::InitBCPosition(Particle* bcparticles)
 		    bcparticles++;		 
 	}
 	}
+
+	#else
+	{
+		//debug case(with 12 bc particles around 4 fluid particles
+		int bcnpx = bc_count/4 + 1;
+		int bcnpz = bc_count/4 - 1;
+		double bcdx = dx/2;
+		double bcdz = dz/2;
+		for(int i=0; i<bc_count; i++)
+		{
+			if(i<bcnpx)
+			{
+				bcparitcles->position.z = 0.0 - dz;
+				bcparticles->position.x = (bcpartilces->id-1)*bcdx - dx;
+			} 
+			else if(i< bc_count/2)
+			{
+				bcparticles->position.x = bcdx * (bcnpx - 1) - dx;
+				bcparticles->position.z = (bcparticles->id - bcnpx)*bcdz - dz;
+			}
+			else if(i< bc_count - bcnpx + 1)
+			{
+				bcparticles->position.z = (bcnpz+1)*bcdz -dz;
+				bcparticles->position.x = ( 3*bc_count/4 - bcparticles->id -1 )*bcdx;
+			}
+			else
+			{
+				bcparticles->position.x = 0.0-dx;
+				bcparticles->position.z = (bc_count - bcparticles->id -1)*bcdz;
+			}
+			bcparticles++ ;
+		}
+	}
 	#endif
 }
-
-
-
-
-	
-
-
 
