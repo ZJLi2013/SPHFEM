@@ -11,9 +11,6 @@ void SphFluidSolver::boundary_force(Particle &particle,list<Particle>& bcp_list,
 {	
 	
 	Vector2f bc_force(0.0f);
-/*	Vector2f wall_normal(0.0f); // need data or call a function 
-	Vector2f wall_tang(0.0f); //need data
-*/
 	Vector2f wall_N = wall_normal[index];
 	Vector2f wall_T = wall_tang[index];
 
@@ -37,8 +34,8 @@ void SphFluidSolver::boundary_force(Particle &particle,list<Particle>& bcp_list,
 
 	if(q <1.0 && psi > 0.0 && fabs(xi) < deltapp)
 {   	
-		Vector2f dr = bcpiter->position - particle.position;
-		float u_normal = dot(dr, wall_N);
+		Vector2f dv = bcpiter->velocity - particle.velocity;
+		float u_normal = dot(dv, wall_N);
 /* u_normal < 0 , particles are approaching
  * u_normal > 0 , particles are moving apart
  */	
