@@ -30,3 +30,13 @@ so this is the first debug version, fixed 3 things:
 1 implicit type change e.g.  3/16 -> 3./16   
 2 parameters transfered by reference, rather than by (value) copy, which if so will not update particle properties as we wish
 3 adding boundary wall direction vectors for boundary force caluculation,using std::vector to support random access
+
+
+Oct 27
+This is second debug version, adding debug_IO data and update boundary-wall-dirction-vectors, espeiclally on corner points
+
+Till now the code can running successfully, while the initial mass/pressure/density data still need fitted
+
+P.S. This is the first C++ project, which is a really small toy. I expected to finish it within 4 weeks, which however till now has spent almost 8 weeks, and during which I got experience in makefile, c++ project file management, gdb debug, stl iterators, re-construct
+
+What I am going to do next is coming back to the SPH algorithm. I think during these several weeks, I can easily use C++ tool, so it's time to focus on algorithm.
