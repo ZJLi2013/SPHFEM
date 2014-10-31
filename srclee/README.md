@@ -33,10 +33,15 @@ so this is the first debug version, fixed 3 things:
 
 
 Oct 27
-This is second debug version, adding debug_IO data and update boundary-wall-dirction-vectors, espeiclally on corner points
+This is second debug version, adding debugIO data and update boundary-wall-dirction-vectors, espeiclally on corner points
 
 Till now the code can running successfully, while the initial mass/pressure/density data still need fitted
 
 P.S. This is the first C++ project, which is a really small toy. I expected to finish it within 4 weeks, which however till now has spent almost 8 weeks, and during which I got experience in makefile, c++ project file management, gdb debug, stl iterators, re-construct
 
 What I am going to do next is coming back to the SPH algorithm. I think during these several weeks, I can easily use C++ tool, so it's time to focus on algorithm.
+
+Oct 31
+In this weekdays, I tried link list algorithm in CppSPH.
+and also done the debug test. As for the 4 fluid points test, the smooth support domain is cut offed, so the kernel usually doesn't work right.
+One strong feeling is IO is dirty, how to obtain particles is a case to case odd jobs
