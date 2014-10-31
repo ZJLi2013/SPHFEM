@@ -5,8 +5,9 @@
 #define TS 0.0001 //timestep
 int main() 
 {
-	int count(1681), bc_count(328), npx(41), npz(41);
+//	int count(1681), bc_count(328), npx(41), npz(41);
 
+	int count(4), bc_count(24), npx(2), npz(2);
 	SphSystem Project(count, bc_count, npx, npz,HSML, HSML);
 	SphFluidSolver solver(HSML,TS);
 

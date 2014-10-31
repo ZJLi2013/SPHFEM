@@ -52,7 +52,7 @@ void SphFluidSolver::boundary_force(Particle &particle,list<Particle>& bcp_list,
 }       else
 		 bc_force = Vector2f(0.0f);
 	
-	particle.force -=bc_force; 
+	particle.force -=bc_force* bcpiter->mass; 
 	index++;
 	}
 		}

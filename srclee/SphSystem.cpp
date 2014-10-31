@@ -68,7 +68,7 @@ void SphSystem::InitFluidPosition(Particle* particles)
 		   }
 
 	   }
-	  #ifdef CASE1
+/*	  #ifdef CASE1
 	{  //case 1::rectangular
 	  	int np=count;
 		int raw=0,  col=0; 
@@ -93,6 +93,7 @@ void SphSystem::InitFluidPosition(Particle* particles)
 		  	   	particles++;
 		   }
 	}
+*/
 	#else 
 	{
 		//debug case (with 4 fluid particles and 12 bc particles around)
@@ -100,7 +101,7 @@ void SphSystem::InitFluidPosition(Particle* particles)
 			for(int j=1; j<=npz; j++)
 			{
 				int raw = (particles->id+1)%npx;
-				int col = (int) floor((particles->id)/npx);
+				int col = (int) floor((particles->id -1)/npx);
 	
 				particles->position.x = raw*dx;
 				particles->position.z = col*dz;
@@ -171,7 +172,7 @@ void SphSystem::InitBCPosition(Particle* bcparticles)
 		 
 	}
 	
-	#ifdef CASE1
+/*	#ifdef CASE1
 	{
 	int bcnpz(npz*2-1), bcnpx(npz*2-1);
 	double bcdx=dx/2, bcdz=dz/2;
@@ -202,7 +203,7 @@ void SphSystem::InitBCPosition(Particle* bcparticles)
 		    bcparticles++;		 
 	}
 	}
-
+*/
 	#else
 	{
 		//debug case(with 12 bc particles around 4 fluid particles
@@ -214,8 +215,8 @@ void SphSystem::InitBCPosition(Particle* bcparticles)
 		{
 			if(i<bcnpx)
 			{
-				bcparitcles->position.z = 0.0 - dz;
-				bcparticles->position.x = (bcpartilces->id-1)*bcdx - dx;
+				bcparticles->position.z = 0.0 - dz;
+				bcparticles->position.x = (bcparticles->id-1)*bcdx - dx;
 			} 
 			else if(i< bc_count/2)
 			{
