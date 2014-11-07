@@ -17,12 +17,12 @@ struct Particle {
 	float mass;
 	float density;
 	float pressure;
+	float drho;
 	Vector2f position;
 	Vector2f velocity;
 	Vector2f force;	
-	Vector2f viscosity;
 
-	Particle(): mass(0.625e-6), density(1000.0), pressure(0.1)
+	Particle(): mass(0.625e-6), density(1000.0), drho(0.0), pressure(0.1)
 	{
 	}
 };
@@ -41,7 +41,7 @@ SphFluidSolver(	float hsml,
 		float timestep) 
  : hsml(hsml),
    timestep(timestep),
-   vsp(10.0)	{
+   vsp(30.0)	{
   }
 
 void update(list<Particle>& p_list);
@@ -79,8 +79,10 @@ void update_forces(list<Particle>& p_list);
 void boundary_force(Particle &particle, list<Particle>& bcp_list, vector<Vector2f>& wall_tang, vector<Vector2f>& wall_normal);
 
 void update_particle(Particle &particle);
-
+float EoS(const Particle& particle);
 void update_particles(list<Particle>& p_list);
+void reset_particles(list<Particle>& p_list);
+void reset_particle(Particle& particle);
 
 };
 #endif
