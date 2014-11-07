@@ -45,3 +45,7 @@ Oct 31
 In this weekdays, I tried link list algorithm in CppSPH.
 and also done the debug test. As for the 4 fluid points test, the smooth support domain is cut offed, so the kernel usually doesn't work right.
 One strong feeling is IO is dirty, how to obtain particles is a case to case odd jobs
+
+Nov 7
+Another week is gone, what I am doing? fixed the force iterm, and make 4-fp looks good
+
