@@ -69,13 +69,14 @@ void RigidBody::collect_force()
 		piter->force = Vector2f(random_force);
 		TmpF += piter->force;
 		piter->rel_pos = piter->position - CenterPosition;
-		TmpJ += dot(piter->force,piter->rel_pos);
+	//	TmpJ += dot(piter->force,piter->rel_pos);
 /*	cout << " ------------------------------------" << endl;
 	cout << "TmpJ " << TmpJ << endl; 
 	cout << piter->rel_pos.x << " " << piter->rel_pos.z << endl;
 	cout << " -------------------------------------" << endl;
 */	}
 	linear_acc = TmpF/Mass;
+	TmpJ = Mass * (0.625*0.625)/6; //if consider continuous mass, then the inertia moment looks like this.
 	angular_acc = TmpJ/Inertia;
 	//cout<< "linear_acc " << length(linear_acc) << " " << "angular_acc " << angular_acc << endl;
 }
