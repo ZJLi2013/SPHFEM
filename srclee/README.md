@@ -49,3 +49,7 @@ One strong feeling is IO is dirty, how to obtain particles is a case to case odd
 Nov 7
 Another week is gone, what I am doing? fixed the force iterm, and make 4-fp looks good
 
+
+Nov 9
+Tonight, I testify the coupled algorithm, with the simple rigid body case. It looks right now.
+the following work is maybe a better case and  implement of beam FEM
